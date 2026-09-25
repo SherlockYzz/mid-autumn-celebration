@@ -1,0 +1,33 @@
+# Executables and Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.obj
+*.out
+
+# Packaging & Distribution Outputs
+packaging/dist/
+packaging/output/
+
+# Temporary and Test Outputs
+tests/*.exe
+tests/*.txt
+*.tmp
+*.log
+
+# Build Directories
+build/
+bin/
+out/
+
+# IDE / Editor Settings
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
