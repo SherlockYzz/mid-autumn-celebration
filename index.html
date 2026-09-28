@@ -1,0 +1,2940 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>中华华节盛典 · 岁时交互引擎系统</title>
+  <style>
+    :root {
+      --gold-primary: #f5d77f;
+      --gold-bright: #fff2a8;
+      --gold-dark: #b8860b;
+      --crimson: #c9372c;
+      --vermilion: #e64a19;
+      --ink-dark: #080d1a;
+      --ink-blue: #0b1528;
+      --jade: #4db6ac;
+      --glass-bg: rgba(14, 22, 40, 0.78);
+      --glass-border: rgba(245, 215, 127, 0.35);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+      --font-serif: "Songti SC", "SimSun", "Noto Serif CJK SC", "STSong", "PingFang SC", serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--ink-dark);
+      font-family: var(--font-serif);
+      color: #fff;
+    }
+
+    /* 主画布 */
+    #festival-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
+    }
+
+    /* 顶部导航与状态栏 (HUD) */
+    .top-nav {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .top-nav > * {
+      pointer-events: auto;
+    }
+
+    .brand-seal-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      padding: 6px 16px 6px 10px;
+      box-shadow: var(--glass-shadow);
+    }
+
+    .seal-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--crimson), #801313);
+      border: 1px solid var(--gold-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--gold-bright);
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(201, 55, 44, 0.6);
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-main-title {
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      background: linear-gradient(180deg, #fff, var(--gold-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub-title {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.6);
+      letter-spacing: 1px;
+    }
+
+    /* 节日选择 Dock */
+    .festival-dock {
+      display: flex;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      padding: 4px;
+      box-shadow: var(--glass-shadow);
+      gap: 4px;
+    }
+
+    .fest-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.75);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .fest-tab-btn:hover {
+      color: var(--gold-bright);
+      background: rgba(245, 215, 127, 0.12);
+    }
+
+    .fest-tab-btn.active {
+      background: linear-gradient(135deg, rgba(245, 215, 127, 0.25), rgba(201, 55, 44, 0.35));
+      border-color: var(--gold-primary);
+      color: var(--gold-bright);
+      font-weight: bold;
+      box-shadow: 0 0 14px rgba(245, 215, 127, 0.4);
+    }
+
+    .tab-hotkey-badge {
+      font-size: 10px;
+      opacity: 0.7;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* 顶部右侧状态控制组 */
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-chip {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 6px 14px;
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--gold-bright);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .hud-chip:hover {
+      background: rgba(245, 215, 127, 0.2);
+      border-color: var(--gold-bright);
+      transform: translateY(-1px);
+    }
+
+    .heat-val {
+      font-weight: bold;
+      color: #ffca28;
+      text-shadow: 0 0 8px rgba(255, 202, 40, 0.6);
+      font-size: 14px;
+    }
+
+    /* 账户状态药丸按钮 */
+    .user-account-pill {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 4px 12px 4px 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: var(--glass-shadow);
+      transition: all 0.2s ease;
+    }
+
+    .user-account-pill:hover {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 16px rgba(245, 215, 127, 0.4);
+    }
+
+    .user-avatar-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      border: 1px solid var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .user-info-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .user-name-label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #fff;
+      max-width: 90px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .user-title-tag {
+      font-size: 10px;
+      color: var(--gold-primary);
+    }
+
+    /* 屏幕正中悬浮项目横幅标语 */
+    .active-project-banner {
+      position: absolute;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      background: linear-gradient(90deg, transparent, rgba(14, 22, 40, 0.85) 20%, rgba(14, 22, 40, 0.85) 80%, transparent);
+      border-top: 1px solid rgba(245, 215, 127, 0.3);
+      border-bottom: 1px solid rgba(245, 215, 127, 0.3);
+      padding: 6px 36px;
+      font-size: 14px;
+      letter-spacing: 3px;
+      color: var(--gold-bright);
+      text-shadow: 0 0 10px rgba(245, 215, 127, 0.7);
+      pointer-events: none;
+      white-space: nowrap;
+      animation: bannerGlow 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes bannerGlow {
+      0% { text-shadow: 0 0 8px rgba(245, 215, 127, 0.5); }
+      100% { text-shadow: 0 0 20px rgba(255, 235, 130, 0.95), 0 0 30px rgba(201, 55, 44, 0.6); }
+    }
+
+    /* 左右两对联立柱 (新春/中秋自选联) */
+    .pillar-couplet {
+      position: absolute;
+      top: 130px;
+      z-index: 5;
+      writing-mode: vertical-rl;
+      background: linear-gradient(180deg, #991b1b, #7f1d1d);
+      border: 1px solid var(--gold-primary);
+      border-radius: 6px;
+      padding: 14px 6px;
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 6px;
+      color: var(--gold-bright);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(245, 215, 127, 0.3);
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .couplet-left { left: 24px; }
+    .couplet-right { right: 24px; }
+
+    /* 底部操作面板与快捷键条 */
+    .bottom-bar {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .bottom-bar > * {
+      pointer-events: auto;
+    }
+
+    .action-dock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      padding: 6px 12px;
+      box-shadow: var(--glass-shadow);
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(245, 215, 127, 0.25);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .action-btn:hover {
+      background: rgba(245, 215, 127, 0.22);
+      border-color: var(--gold-primary);
+      color: var(--gold-bright);
+      transform: translateY(-2px);
+    }
+
+    .action-btn.btn-grand {
+      background: linear-gradient(135deg, #c9372c, #801313);
+      border-color: var(--gold-primary);
+      color: var(--gold-bright);
+      font-weight: bold;
+      box-shadow: 0 0 16px rgba(201, 55, 44, 0.6);
+      animation: pulseBtn 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseBtn {
+      0%, 100% { box-shadow: 0 0 12px rgba(201, 55, 44, 0.5); }
+      50% { box-shadow: 0 0 24px rgba(245, 215, 127, 0.8), 0 0 32px rgba(201, 55, 44, 0.8); }
+    }
+
+    .key-badge {
+      font-size: 10px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: var(--gold-bright);
+    }
+
+    /* 右下角工具组 */
+    .bottom-right-dock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 移动端底部专用触控导航条 (屏幕小于 768px 时展现) */
+    .mobile-tabbar {
+      display: none;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(8, 13, 26, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--glass-border);
+      z-index: 20;
+      justify-content: space-around;
+      align-items: center;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .mobile-tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 11px;
+      font-family: inherit;
+      cursor: pointer;
+      gap: 3px;
+      width: 20%;
+      height: 100%;
+    }
+
+    .mobile-tab-item.active {
+      color: var(--gold-bright);
+      font-weight: bold;
+    }
+
+    .mobile-tab-item span.icon {
+      font-size: 18px;
+    }
+
+    .mobile-grand-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--crimson), #7f1d1d);
+      border: 2px solid var(--gold-primary);
+      color: var(--gold-bright);
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(201, 55, 44, 0.7);
+      margin-top: -16px;
+    }
+
+    /* 通用弹窗模态框 (Dialog) */
+    dialog.modal-dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 760px;
+      max-height: 85vh;
+      background: rgba(11, 21, 40, 0.94);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--gold-primary);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 215, 127, 0.25);
+      color: #fff;
+      padding: 0;
+      overflow: hidden;
+      z-index: 100;
+    }
+
+    dialog::backdrop {
+      background-color: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: linear-gradient(90deg, rgba(201, 55, 44, 0.3), rgba(11, 21, 40, 0.4));
+      border-bottom: 1px solid rgba(245, 215, 127, 0.25);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--gold-bright);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 1px;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 20px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+      max-height: calc(85vh - 70px);
+      overflow-y: auto;
+      font-family: var(--font-sans);
+    }
+
+    /* 选项卡系统 */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid rgba(245, 215, 127, 0.2);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.65);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(245, 215, 127, 0.15);
+      border-color: var(--gold-primary);
+      color: var(--gold-bright);
+      font-weight: bold;
+    }
+
+    /* 表单与输入控件 */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      color: var(--gold-bright);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(245, 215, 127, 0.3);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(245, 215, 127, 0.3);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      border: 1px solid var(--gold-bright);
+      color: #0b1528;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--gold-bright), var(--gold-primary));
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(245, 215, 127, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    /* 工坊项目卡片网格 */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .project-card {
+      background: rgba(18, 30, 56, 0.6);
+      border: 1px solid rgba(245, 215, 127, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .project-card:hover {
+      border-color: var(--gold-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .project-card.active-project {
+      border-color: #ffca28;
+      background: rgba(245, 215, 127, 0.08);
+      box-shadow: 0 0 16px rgba(245, 215, 127, 0.3);
+    }
+
+    .project-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--gold-bright);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .project-desc {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+    }
+
+    .project-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .project-card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* 签文藏经阁卡片 */
+    .divination-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .divine-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--gold-primary);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .divine-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--gold-bright);
+      font-family: var(--font-serif);
+      letter-spacing: 2px;
+    }
+
+    .divine-poem {
+      font-size: 13px;
+      color: #e2e8f0;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    /* 成就殿徽章网格 */
+    .achievement-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .achievement-card {
+      background: rgba(18, 30, 56, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      opacity: 0.5;
+      transition: all 0.3s;
+    }
+
+    .achievement-card.unlocked {
+      opacity: 1;
+      border-color: var(--gold-primary);
+      background: linear-gradient(135deg, rgba(245, 215, 127, 0.12), rgba(18, 30, 56, 0.7));
+      box-shadow: 0 0 14px rgba(245, 215, 127, 0.2);
+    }
+
+    .achievement-icon {
+      font-size: 28px;
+    }
+
+    .achievement-info h4 {
+      font-size: 14px;
+      color: var(--gold-bright);
+      margin-bottom: 2px;
+    }
+
+    .achievement-info p {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* 经验升级漂浮通知 */
+    .exp-toast {
+      position: fixed;
+      top: 90px;
+      right: 24px;
+      z-index: 200;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      border: 1px solid var(--gold-bright);
+      border-radius: 30px;
+      padding: 8px 18px;
+      color: var(--gold-bright);
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(-20px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .exp-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* 头像选择器网格 */
+    .avatar-picker {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .avatar-option {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .avatar-option.selected {
+      border-color: var(--gold-primary);
+      background: rgba(245, 215, 127, 0.2);
+      box-shadow: 0 0 10px rgba(245, 215, 127, 0.4);
+    }
+
+    .avatar-option-icon {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .avatar-option-name {
+      font-size: 11px;
+      color: #e2e8f0;
+    }
+
+    /* 响应式样式适配 (Responsive Breakpoints) */
+    @media (max-width: 992px) {
+      .pillar-couplet { display: none; }
+      .brand-sub-title { display: none; }
+      .tab-hotkey-badge { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .festival-dock { display: none; } /* 移动端在底部栏与菜单中选择 */
+      .action-dock { display: none; }
+      .mobile-tabbar { display: flex; }
+      .bottom-bar { display: none; }
+      .top-nav { top: 8px; left: 8px; right: 8px; }
+      .active-project-banner {
+        top: 60px;
+        font-size: 12px;
+        padding: 4px 16px;
+      }
+      dialog.modal-dialog {
+        width: 95%;
+        max-height: 90vh;
+      }
+      .modal-body {
+        padding: 14px;
+      }
+    }
+
+    /* 岁时灵仙 AI 智能体样式 */
+    .agent-msg-bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 88%;
+    }
+    .agent-msg-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(201, 55, 44, 0.45), rgba(127, 29, 29, 0.65));
+      border: 1px solid rgba(245, 215, 127, 0.4);
+      color: #fff;
+    }
+    .agent-msg-bot {
+      align-self: flex-start;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(186, 104, 200, 0.4);
+      color: #f1f5f9;
+    }
+    .agent-thought-block {
+      background: rgba(0, 0, 0, 0.35);
+      border-left: 3px solid #ba68c8;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: #ce93d8;
+      margin-bottom: 6px;
+      border-radius: 4px;
+      font-family: var(--font-sans);
+    }
+    .agent-action-badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(186, 104, 200, 0.25);
+      border: 1px solid #ba68c8;
+      color: #f3e5f5;
+      margin-top: 4px;
+      margin-right: 4px;
+    }
+    .agent-chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(186, 104, 200, 0.35);
+      color: #e1bee7;
+      border-radius: 16px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .agent-chip:hover {
+      background: rgba(186, 104, 200, 0.3);
+      border-color: #ba68c8;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 主交互渲染画布 -->
+  <canvas id="festival-canvas"></canvas>
+
+  <!-- 顶部导航与状态栏 (HUD) -->
+  <header class="top-nav">
+    <div class="brand-seal-badge">
+      <div class="seal-icon">华</div>
+      <div class="brand-title-wrap">
+        <span class="brand-main-title">中华华节盛典</span>
+        <span class="brand-sub-title">岁时交互引擎 · 全景平台</span>
+      </div>
+    </div>
+
+    <!-- 节日选择 Dock (桌面与平板端) -->
+    <nav class="festival-dock" aria-label="节日切换">
+      <button class="fest-tab-btn active" data-fest="mid_autumn" title="快捷键 [1]">
+        <span>🌕</span> 中秋追月 <span class="tab-hotkey-badge">1</span>
+      </button>
+      <button class="fest-tab-btn" data-fest="national_day" title="快捷键 [2]">
+        <span>🇨🇳</span> 盛世国庆 <span class="tab-hotkey-badge">2</span>
+      </button>
+      <button class="fest-tab-btn" data-fest="spring_festival" title="快捷键 [3]">
+        <span>🏮</span> 新春除夕 <span class="tab-hotkey-badge">3</span>
+      </button>
+      <button class="fest-tab-btn" data-fest="lantern_festival" title="快捷键 [4]">
+        <span>🎏</span> 上元灯会 <span class="tab-hotkey-badge">4</span>
+      </button>
+    </nav>
+
+    <!-- 顶部右侧控制群 -->
+    <div class="top-controls">
+      <div class="hud-chip" id="heat-chip" title="当前累计节庆热度（每增2000点引爆大盛典）">
+        <span>🔥</span> 热度 <span class="heat-val" id="hud-heat-val">666</span>
+      </div>
+      <div class="hud-chip" id="sound-chip" title="切换背景雅乐与真实音效">
+        <span id="sound-icon">🎵</span> 音效: <span id="sound-state">开</span>
+      </div>
+      <div class="user-account-pill" id="user-pill" title="个人账户与等级成长">
+        <div class="user-avatar-badge" id="hud-avatar">🐰</div>
+        <div class="user-info-text">
+          <span class="user-name-label" id="hud-username">游客·雅士</span>
+          <span class="user-title-tag" id="hud-title">Lv.1 岁时童生</span>
+        </div>
+      </div>
+      <button class="hud-chip" id="btn-agent-open-top" title="岁时司律灵仙 · AI 智能决策与对联盛典定制" style="background: linear-gradient(135deg, rgba(106, 27, 154, 0.4), rgba(74, 20, 140, 0.6)); border-color: #ba68c8; color: #f3e5f5;">
+        <span>🔮</span> 灵仙智脑
+      </button>
+      <button class="hud-chip" id="project-mgr-btn" title="庆典工坊、祈愿墙与个人管理中心">
+        <span>🏛️</span> 工坊中心
+      </button>
+      <button class="hud-chip" id="fullscreen-btn" title="全屏沉浸体验">
+        <span>⛶</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 当前激活的庆典项目动态横幅 -->
+  <div class="active-project-banner" id="project-banner">
+    祝天下华人阖家团圆，国泰民安，万象更新！
+  </div>
+
+  <!-- 两侧自选对联立柱 (支持工坊动态定制) -->
+  <div class="pillar-couplet couplet-left" id="couplet-left">满地月华涵太液</div>
+  <div class="pillar-couplet couplet-right" id="couplet-right">一轮秋水照昆仑</div>
+
+  <!-- 桌面端底部常驻快捷操作栏 -->
+  <div class="bottom-bar">
+    <div class="action-dock" id="action-dock">
+      <button class="action-btn btn-grand" id="btn-grand-celebrate" title="全屏引爆全部庆祝效果">
+        <span>🌟</span> 华彩盛典 <span class="key-badge">ENTER</span>
+      </button>
+      <button class="action-btn" id="btn-firework" title="发射一枚高空璀璨烟花">
+        <span>🎆</span> 放烟花 <span class="key-badge">SPACE</span>
+      </button>
+      <!-- 动态节日专属按键 -->
+      <button class="action-btn" id="btn-fest-special-1">
+        <span>🐰</span> 灵兔捣药 <span class="key-badge">R</span>
+      </button>
+      <button class="action-btn" id="btn-fest-special-2">
+        <span>🎋</span> 追月灵签 <span class="key-badge">J</span>
+      </button>
+      <button class="action-btn" id="btn-fest-special-3">
+        <span>🏮</span> 猜灯谜 <span class="key-badge">T</span>
+      </button>
+      <button class="action-btn" id="btn-fest-special-4">
+        <span>📜</span> 赏灯筑阁 <span class="key-badge">K</span>
+      </button>
+      <button class="action-btn" id="btn-wish" title="撰写并放飞心愿">
+        <span>🎐</span> 祈愿天灯 <span class="key-badge">W</span>
+      </button>
+    </div>
+
+    <div class="bottom-right-dock">
+      <button class="action-btn" id="btn-agent-open-bottom" title="吩咐岁时灵仙智能决策编排" style="background: linear-gradient(135deg, rgba(106, 27, 154, 0.4), rgba(74, 20, 140, 0.6)); border-color: #ba68c8; color: #fff;">
+        <span>🔮</span> 灵仙智脑 <span class="key-badge">I</span>
+      </button>
+      <button class="action-btn" id="btn-guide" title="查看全部快捷键与民俗玩法指南">
+        <span>🏮</span> 游园锦囊 <span class="key-badge">H</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 移动端底部触控导航条 -->
+  <nav class="mobile-tabbar" aria-label="移动端交互">
+    <button class="mobile-tab-item active" id="m-btn-fest">
+      <span class="icon">🏮</span>
+      <span>换节日</span>
+    </button>
+    <button class="mobile-tab-item" id="m-btn-firework">
+      <span class="icon">🎆</span>
+      <span>放烟花</span>
+    </button>
+    <button class="mobile-tab-item" id="m-btn-grand">
+      <div class="mobile-grand-btn">🌟</div>
+    </button>
+    <button class="mobile-tab-item" id="m-btn-agent">
+      <span class="icon">🔮</span>
+      <span>AI灵仙</span>
+    </button>
+    <button class="mobile-tab-item" id="m-btn-profile">
+      <span class="icon">🏛️</span>
+      <span>工坊中心</span>
+    </button>
+  </nav>
+
+  <!-- 经验晋升与里程碑飘字提示 -->
+  <div class="exp-toast" id="exp-toast">
+    <span>🌟</span> <span id="exp-toast-text">+30 EXP · 岁时祈福</span>
+  </div>
+
+  <!-- ==================== 模态框 1: 个人管理中心与庆典工坊 ==================== -->
+  <dialog class="modal-dialog" id="project-mgr-modal" closedby="any" aria-labelledby="mgrModalTitle">
+    <div class="modal-header">
+      <div class="modal-title" id="mgrModalTitle">
+        <span>🏛️</span> 庆典工坊与个人管理中心
+      </div>
+      <button class="modal-close-btn" onclick="document.getElementById('project-mgr-modal').close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- 选项卡栏 -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab-projects">🏛️ 庆典工坊</button>
+        <button class="tab-btn" data-tab="tab-wishes">📜 祈愿长生册</button>
+        <button class="tab-btn" data-tab="tab-divinations">🎋 签文藏经阁</button>
+        <button class="tab-btn" data-tab="tab-riddles">🏮 博古功名录</button>
+        <button class="tab-btn" data-tab="tab-achievements">🏆 万象成就殿</button>
+      </div>
+
+      <!-- Tab 1: 庆典工坊 -->
+      <div class="tab-pane" id="tab-projects">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <p style="font-size:13px; color:rgba(255,255,255,0.7);">定制您的专属节日庆典：自选寄语、春联对仗与音乐音色，一键全景激活！</p>
+          <button class="btn-primary" id="btn-create-project-open">+ 新建庆典</button>
+        </div>
+        <div class="project-grid" id="project-cards-container">
+          <!-- 项目卡片由 JS 动态装载 -->
+        </div>
+      </div>
+
+      <!-- Tab 2: 祈愿长生册 -->
+      <div class="tab-pane" id="tab-wishes" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <p style="font-size:13px; color:rgba(255,255,255,0.7);">天下归心，万家灯火。浏览四海同胞的祥瑞寄语，亦可抒写您的永固祈愿。</p>
+          <button class="btn-primary" onclick="openWishComposer()">+ 抒写祈愿</button>
+        </div>
+        <div id="wishes-list-container" style="display:flex; flex-direction:column; gap:10px;">
+          <!-- 祈愿条目动态插入 -->
+        </div>
+      </div>
+
+      <!-- Tab 3: 签文藏经阁 -->
+      <div class="tab-pane" id="tab-divinations" style="display:none;">
+        <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:14px;">您在各大节日摇取的上吉灵签珍藏，每道签文均附带专属全景祥瑞 Buff。</p>
+        <div class="divination-grid" id="divination-cards-container">
+          <!-- 灵签列表 -->
+        </div>
+      </div>
+
+      <!-- Tab 4: 博古功名录 -->
+      <div class="tab-pane" id="tab-riddles" style="display:none;">
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:18px;">
+          <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
+            <div style="font-size:11px; color:rgba(255,255,255,0.6);">累计作答</div>
+            <div style="font-size:20px; font-weight:bold; color:var(--gold-bright);" id="riddle-stat-total">0 次</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
+            <div style="font-size:11px; color:rgba(255,255,255,0.6);">正确题数</div>
+            <div style="font-size:20px; font-weight:bold; color:#4caf50;" id="riddle-stat-correct">0 题</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
+            <div style="font-size:11px; color:rgba(255,255,255,0.6);">准确率</div>
+            <div style="font-size:20px; font-weight:bold; color:#ffca28;" id="riddle-stat-acc">0%</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
+            <div style="font-size:11px; color:rgba(255,255,255,0.6);">贡献热度</div>
+            <div style="font-size:20px; font-weight:bold; color:var(--crimson);" id="riddle-stat-heat">+0</div>
+          </div>
+        </div>
+        <p style="font-size:13px; color:rgba(255,255,255,0.6);">按下键盘 <span class="key-badge">T</span> 随时开启华夏博古问答与元宵灯谜挑战！</p>
+      </div>
+
+      <!-- Tab 5: 万象成就殿 -->
+      <div class="tab-pane" id="tab-achievements" style="display:none;">
+        <div class="achievement-grid" id="achievement-cards-container">
+          <!-- 成就卡片 -->
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ==================== 模态框 2: 账户登录/注册/管理 ==================== -->
+  <dialog class="modal-dialog" id="account-modal" closedby="any" aria-labelledby="accountModalTitle" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title" id="accountModalTitle">
+        <span>👤</span> 华夏游园账户
+      </div>
+      <button class="modal-close-btn" onclick="document.getElementById('account-modal').close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- 选项卡 -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-auth-tab="pane-login" id="tab-btn-login">登录</button>
+        <button class="tab-btn" data-auth-tab="pane-register" id="tab-btn-register">注册新号</button>
+        <button class="tab-btn" data-auth-tab="pane-profile" id="tab-btn-profile" style="display:none;">个人修养</button>
+      </div>
+
+      <!-- 登录面板 -->
+      <form id="form-login" onsubmit="handleLoginSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" class="form-input" id="login-username" required placeholder="请输入用户名">
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" class="form-input" id="login-password" required placeholder="请输入登录密码">
+        </div>
+        <div style="display:flex; justify-content:space-between; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-secondary" onclick="handleGuestLogin()">⚡ 一键游客体验</button>
+          <button type="submit" class="btn-primary">登入盛典</button>
+        </div>
+      </form>
+
+      <!-- 注册面板 -->
+      <form id="form-register" onsubmit="handleRegisterSubmit(event)" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" class="form-input" id="reg-username" required placeholder="建议 3-16 个字符">
+        </div>
+        <div class="form-group">
+          <label class="form-label">雅号 / 昵称</label>
+          <input type="text" class="form-input" id="reg-nickname" required placeholder="如：司岁客、月下行舟">
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" class="form-input" id="reg-password" required placeholder="不少于 6 位密码">
+        </div>
+        <div class="form-group">
+          <label class="form-label">选择灵兽法相</label>
+          <div class="avatar-picker" id="reg-avatar-picker">
+            <div class="avatar-option selected" data-avatar="玉兔"><span class="avatar-option-icon">🐰</span><span class="avatar-option-name">玉兔</span></div>
+            <div class="avatar-option" data-avatar="瑞狮"><span class="avatar-option-icon">🦁</span><span class="avatar-option-name">瑞狮</span></div>
+            <div class="avatar-option" data-avatar="金鲤"><span class="avatar-option-icon">🎏</span><span class="avatar-option-name">金鲤</span></div>
+            <div class="avatar-option" data-avatar="青龙"><span class="avatar-option-icon">🐉</span><span class="avatar-option-name">青龙</span></div>
+            <div class="avatar-option" data-avatar="朱雀"><span class="avatar-option-icon">🦚</span><span class="avatar-option-name">朱雀</span></div>
+            <div class="avatar-option" data-avatar="麒麟"><span class="avatar-option-icon">🦄</span><span class="avatar-option-name">麒麟</span></div>
+            <div class="avatar-option" data-avatar="玄武"><span class="avatar-option-icon">🐢</span><span class="avatar-option-name">玄武</span></div>
+            <div class="avatar-option" data-avatar="灵鹿"><span class="avatar-option-icon">🦌</span><span class="avatar-option-name">灵鹿</span></div>
+          </div>
+        </div>
+        <div style="margin-top:20px;">
+          <button type="submit" class="btn-primary" style="width:100%;">注册并登录</button>
+        </div>
+      </form>
+
+      <!-- 个人信息与登出面板 -->
+      <div id="pane-profile" style="display:none;">
+        <div style="text-align:center; padding:10px 0;">
+          <div style="font-size:42px; margin-bottom:8px;" id="prof-avatar-big">🐰</div>
+          <h3 id="prof-name" style="color:var(--gold-bright);">游客</h3>
+          <p id="prof-title" style="font-size:12px; color:var(--gold-primary); margin-top:4px;">Lv.1 岁时童生</p>
+          <div style="margin:16px 0; background:rgba(255,255,255,0.08); border-radius:10px; height:8px; overflow:hidden;">
+            <div id="prof-exp-bar" style="background:linear-gradient(90deg, var(--gold-primary), #4caf50); height:100%; width:20%;"></div>
+          </div>
+          <p id="prof-exp-text" style="font-size:11px; color:rgba(255,255,255,0.6);">当前修行: 60 / 100 EXP</p>
+        </div>
+        <div style="margin-top:20px; display:flex; justify-content:space-between;">
+          <button class="btn-secondary" onclick="handleLogout()">登出账户</button>
+          <button class="btn-primary" onclick="document.getElementById('account-modal').close()">返回游园</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ==================== 模态框 3: 创建/编辑自定义庆典项目 ==================== -->
+  <dialog class="modal-dialog" id="create-project-modal" closedby="any" style="max-width:540px;">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span>✨</span> 定制我的节日庆典
+      </div>
+      <button class="modal-close-btn" onclick="document.getElementById('create-project-modal').close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-create-project" onsubmit="handleCreateProjectSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">庆典项目名称</label>
+          <input type="text" class="form-input" id="cp-title" required placeholder="如：2026家族中秋团聚雅集 / 盛世国庆华诞">
+        </div>
+        <div class="form-group">
+          <label class="form-label">核心节日类型</label>
+          <select class="form-select" id="cp-festival">
+            <option value="mid_autumn">🌕 中秋追月 (Mid-Autumn)</option>
+            <option value="national_day">🇨🇳 盛世国庆 (National Day)</option>
+            <option value="spring_festival">🏮 新春除夕 (Spring Festival)</option>
+            <option value="lantern_festival">🎏 上元灯会 (Lantern Festival)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">正中宫廷横幅标语</label>
+          <input type="text" class="form-input" id="cp-banner" required placeholder="如：祝全家福寿安康，万事顺遂！">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label">门前左联</label>
+            <input type="text" class="form-input" id="cp-couplet-left" placeholder="如：满地月华涵太液">
+          </div>
+          <div class="form-group">
+            <label class="form-label">门前右联</label>
+            <input type="text" class="form-input" id="cp-couplet-right" placeholder="如：一轮秋水照昆仑">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">雅乐音色风格</label>
+          <select class="form-select" id="cp-music">
+            <option value="pentatonic_guzheng">清泉流响 · 古筝五声音阶</option>
+            <option value="brass_fanfare">山河壮丽 · 礼炮与军乐号角</option>
+            <option value="firecracker_drum">瑞彩盈门 · 欢庆爆竹与战鼓</option>
+            <option value="chime_bells">空灵澄澈 · 上元编钟水云调</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">项目简介或寄语说明</label>
+          <textarea class="form-textarea" id="cp-desc" rows="2" placeholder="写下一段关于此庆典项目的背景或心愿..."></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-secondary" onclick="document.getElementById('create-project-modal').close()">取消</button>
+          <button type="submit" class="btn-primary">保存并立即激活</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ==================== 模态框 4: 抒写祈愿 ==================== -->
+  <dialog class="modal-dialog" id="wish-modal" closedby="any" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title"><span>🎐</span> 天灯与心愿寄语</div>
+      <button class="modal-close-btn" onclick="document.getElementById('wish-modal').close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="handleSendWish(event)">
+        <div class="form-group">
+          <label class="form-label">受福之人 / 祈福对象</label>
+          <input type="text" class="form-input" id="wish-target" required placeholder="如：家人、祖国、全体好友、自己">
+        </div>
+        <div class="form-group">
+          <label class="form-label">祈愿寄语内容</label>
+          <textarea class="form-textarea" id="wish-content" rows="3" required placeholder="写下您的美好祈愿（将随天灯漫游苍穹，并永久载入四海祈愿墙）..."></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+          <button type="button" class="btn-secondary" onclick="document.getElementById('wish-modal').close()">暂存</button>
+          <button type="submit" class="btn-primary">放飞祈愿天灯</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ==================== 模态框 5: 灵签卜算与诗意解语 ==================== -->
+  <dialog class="modal-dialog" id="divination-modal" closedby="any" style="max-width:420px; text-align:center;">
+    <div class="modal-header">
+      <div class="modal-title"><span>🎋</span> 岁时灵签 · 卜问月华</div>
+      <button class="modal-close-btn" onclick="document.getElementById('divination-modal').close()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:28px 20px;">
+      <div style="font-size:44px; margin-bottom:12px;">🎋</div>
+      <h2 id="divine-modal-title" style="color:var(--gold-bright); letter-spacing:4px; font-size:22px; margin-bottom:12px;">【上上签 · 月华如愿】</h2>
+      <p id="divine-modal-poem" style="font-size:15px; line-height:1.8; color:#f1f5f9; font-style:italic; margin-bottom:16px;">
+        清辉凝碧汉，金桂拂云香。<br>所求皆所愿，四海共安康。
+      </p>
+      <div style="background:rgba(245, 215, 127, 0.12); border:1px dashed var(--gold-primary); border-radius:8px; padding:10px; margin-bottom:20px;">
+        <span style="font-size:12px; color:var(--gold-bright);" id="divine-modal-buff">已激活全域祥瑞 Buff: 月华脉冲增强 300%</span>
+      </div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button class="btn-secondary" onclick="triggerDivination()">再摇一签</button>
+        <button class="btn-primary" onclick="document.getElementById('divination-modal').close()">领受赐福</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ==================== 模态框 6: 猜灯谜与博古问答 ==================== -->
+  <dialog class="modal-dialog" id="riddle-modal" closedby="any" style="max-width:500px;">
+    <div class="modal-header">
+      <div class="modal-title"><span>🏮</span> 岁时博古 · 雅趣答题</div>
+      <button class="modal-close-btn" onclick="document.getElementById('riddle-modal').close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px; color:var(--gold-primary); margin-bottom:8px;" id="riddle-type-label">【中秋诗词灯谜】</div>
+      <h3 style="font-size:16px; color:#fff; line-height:1.6; margin-bottom:18px;" id="riddle-question">云开月露（打一字）</h3>
+      <div style="display:flex; flex-direction:column; gap:10px;" id="riddle-options-container">
+        <!-- 选项 A B C D -->
+      </div>
+      <div id="riddle-feedback" style="margin-top:14px; font-size:13px; font-weight:bold; display:none;"></div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+        <button class="btn-secondary" onclick="nextRiddle()">换一题</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ==================== 模态框 7: 游园锦囊指南 ==================== -->
+  <dialog class="modal-dialog" id="guide-modal" closedby="any" style="max-width:600px;">
+    <div class="modal-header">
+      <div class="modal-title"><span>📜</span> 游园锦囊 · 全景指南</div>
+      <button class="modal-close-btn" onclick="document.getElementById('guide-modal').close()">✕</button>
+    </div>
+    <div class="modal-body" style="font-size:13px; line-height:1.8; color:#e2e8f0;">
+      <h4 style="color:var(--gold-bright); margin-bottom:6px;">🌟 快捷键指南</h4>
+      <p><span class="key-badge">1</span> ~ <span class="key-badge">4</span> 或 <span class="key-badge">TAB</span>: 无缝切换中秋、国庆、新春、元宵四大全景</p>
+      <p><span class="key-badge">ENTER</span>: <strong>万象盛典</strong>（一键引爆全部庆祝效果，持续盛放）</p>
+      <p><span class="key-badge">SPACE</span>: <strong>即时放烟花</strong>（高空多角度绚烂焰火）</p>
+      <p><span class="key-badge">J</span>: <strong>追月灵签</strong>（摇筒卜求上吉运签并获得专属祥瑞 Buff）</p>
+      <p><span class="key-badge">T</span>: <strong>猜灯谜 / 华夏问答</strong>（答题获得大量热度与经验值）</p>
+      <p><span class="key-badge">K</span>: <strong>赏灯筑阁</strong>（逐步点亮四级万家灯火市井繁华）</p>
+      <p><span class="key-badge">W</span>: <strong>天灯祈愿</strong>（抒写心愿，升空漫游并同步至四海祈愿墙）</p>
+      <p><span class="key-badge">R</span>: <strong>灵兔仙药 / 瑞兽互动</strong></p>
+      <h4 style="color:var(--gold-bright); margin:14px 0 6px;">🔥 阶梯盛典机制</h4>
+      <p>基础热度 <strong>666</strong> 起步！每增加 <strong>2000 点热度</strong>（1000、3000、5000……），系统将自动全屏触发一次【万象共鸣】华彩盛典！</p>
+      <h4 style="color:var(--gold-bright); margin:14px 0 6px;">🏛️ 庆典工坊</h4>
+      <p>点击右上角「工坊中心」，即可自定门楼对联、项目横幅标语与音色风格，打造您的专属节日空间！</p>
+    </div>
+  </dialog>
+
+  <!-- ==================== 模态框 8: 岁时司律灵仙 · AI 智能决策中枢 ==================== -->
+  <dialog class="modal-dialog" id="agent-modal" closedby="any" style="max-width:580px;">
+    <div class="modal-header" style="background: linear-gradient(90deg, rgba(74, 20, 140, 0.45), rgba(11, 21, 40, 0.45)); border-bottom: 1px solid #ba68c8;">
+      <div class="modal-title" style="color:#f3e5f5;">
+        <span>🔮</span> 岁时司律灵仙 · AI 智能决策中枢
+      </div>
+      <button class="modal-close-btn" onclick="document.getElementById('agent-modal').close()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; height:500px; max-height:75vh;">
+      <div style="background: rgba(106, 27, 154, 0.18); border: 1px dashed #ba68c8; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #e1bee7; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <span>🧠 核心智能体：意图识别 ➔ 文化推理 ➔ 场景与对联协同调度</span>
+        <button class="btn-primary" id="btn-start-autodemo" style="padding: 4px 10px; font-size: 11px;">▶ 5分钟录屏演示</button>
+      </div>
+
+      <div id="agent-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+        <div class="agent-msg-bubble agent-msg-bot">
+          <div class="agent-thought-block">🧠 智能体状态：在线监听中 · 多模块调度引擎已就绪</div>
+          <span>恭候雅士！我是岁时司律灵仙。您可以用自然语言吩咐我：“帮我写一副中秋祝寿春联”、“来一场盛大国庆烟火”、或“帮我向家人许愿中秋安康”，我将为您决策并实时编排全景！</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 6px; overflow-x: auto; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 8px;">
+        <button class="agent-chip" onclick="sendAgentQuick('为全家写一副中秋福寿对联')">🏮 中秋祝寿联</button>
+        <button class="agent-chip" onclick="sendAgentQuick('安排一场国庆三军礼炮全景盛典')">🇨🇳 国庆礼炮盛典</button>
+        <button class="agent-chip" onclick="sendAgentQuick('除夕迎春接福，让金狮起舞')">🦁 新春金狮发财</button>
+        <button class="agent-chip" onclick="sendAgentQuick('卜算一下我下半年的学业前程')">🎋 岁时前程灵签</button>
+        <button class="agent-chip" onclick="sendAgentQuick('向苍穹放飞一盏祈愿国泰民安的天灯')">🎐 放飞山河心愿</button>
+      </div>
+
+      <form id="agent-form" onsubmit="handleAgentSubmit(event)" style="display: flex; gap: 8px; margin-top: 6px;">
+        <input type="text" class="form-input" id="agent-input" placeholder="输入您的节日心愿或指令，智能体为您决策全景编排..." style="flex: 1;">
+        <button type="submit" class="btn-primary" style="padding: 0 18px; white-space: nowrap;">吩咐灵仙</button>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ==================== 核心逻辑脚本 ==================== -->
+  <script>
+    // ==========================================
+    // 1. 声学合成引擎 (Web Audio API - 零外链依赖)
+    // ==========================================
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freq, duration = 0.5, type = 'sine', gainVal = 0.2) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+        gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+      }
+
+      // 五声音阶古筝 (中秋)
+      playGuzhengNote(index = 0) {
+        const pentatonic = [293.66, 329.63, 392.00, 440.00, 493.88, 587.33, 659.25, 783.99]; // D4, E4, G4, A4, B4, D5, E5, G5
+        const f = pentatonic[index % pentatonic.length];
+        this.playTone(f, 1.2, 'triangle', 0.25);
+      }
+
+      // 盛世军号与礼炮 (国庆)
+      playArtillery() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        // 重低音轰鸣
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 1.2);
+
+        gain.gain.setValueAtTime(0.6, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 1.2);
+      }
+
+      // 爆竹与大地红 (新春)
+      playFirecracker() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        for (let i = 0; i < 4; i++) {
+          setTimeout(() => {
+            this.playTone(800 + Math.random() * 600, 0.08, 'square', 0.15);
+          }, i * 60);
+        }
+      }
+
+      // 上元编钟水云调 (元宵)
+      playChime() {
+        const chimes = [523.25, 659.25, 783.99, 1046.50];
+        const f = chimes[Math.floor(Math.random() * chimes.length)];
+        this.playTone(f, 2.0, 'sine', 0.2);
+      }
+
+      // 升级与胜利号角
+      playLevelUp() {
+        const notes = [392, 523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((f, i) => {
+          setTimeout(() => this.playTone(f, 0.4, 'triangle', 0.3), i * 90);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    // ==========================================
+    // 2. 数据与 API 管理中心 (前后端连通 + 离线自愈)
+    // ==========================================
+    class DataManager {
+      constructor() {
+        this.isOnline = false;
+        this.token = localStorage.getItem('festival_auth_token') || null;
+        this.currentUser = null;
+        this.checkServer();
+      }
+
+      async checkServer() {
+        try {
+          const res = await fetch('/api/stats/heat', { method: 'GET' });
+          if (res.ok) {
+            this.isOnline = true;
+            console.log('✓ 已连接至华夏盛典全栈服务端 SQLite 数据库');
+            this.loadMe();
+          }
+        } catch (e) {
+          this.isOnline = false;
+          console.log('ℹ️ 服务端未启动，自动启用本地离线高速数据库 (LocalStorage)');
+          this.loadLocalUser();
+        }
+      }
+
+      loadLocalUser() {
+        const stored = localStorage.getItem('festival_local_user');
+        if (stored) {
+          try { this.currentUser = JSON.parse(stored); } catch(e){}
+        } else {
+          // 默认游客
+          this.currentUser = {
+            id: 999,
+            username: 'guest',
+            nickname: '司岁游园客',
+            avatar: '玉兔',
+            title: '岁时童生',
+            exp: 60,
+            level: 1
+          };
+          localStorage.setItem('festival_local_user', JSON.stringify(this.currentUser));
+        }
+        updateUserUI();
+      }
+
+      async loadMe() {
+        if (!this.token) {
+          this.loadLocalUser();
+          return;
+        }
+        try {
+          const res = await fetch('/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${this.token}` }
+          });
+          const data = await res.json();
+          if (data.success && data.user) {
+            this.currentUser = data.user;
+            updateUserUI();
+          } else {
+            this.loadLocalUser();
+          }
+        } catch(e) {
+          this.loadLocalUser();
+        }
+      }
+
+      async addExp(amount, reason = '') {
+        if (!this.currentUser) return;
+        this.currentUser.exp = (this.currentUser.exp || 0) + amount;
+        
+        // 计算等级与头衔
+        const prevLevel = this.currentUser.level;
+        const calc = calculateLevelAndTitle(this.currentUser.exp);
+        this.currentUser.level = calc.level;
+        this.currentUser.title = calc.title;
+
+        if (this.currentUser.level > prevLevel) {
+          sound.playLevelUp();
+          showExpToast(`🎉 恭喜晋升！荣获新称号：【${calc.title}】`);
+        } else {
+          showExpToast(`+${amount} EXP · ${reason}`);
+        }
+
+        updateUserUI();
+
+        if (this.isOnline && this.token) {
+          fetch('/api/auth/profile', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+            body: JSON.stringify({ nickname: this.currentUser.nickname, avatar: this.currentUser.avatar })
+          }).catch(()=>{});
+        } else {
+          localStorage.setItem('festival_local_user', JSON.stringify(this.currentUser));
+        }
+      }
+
+      // 获取所有项目
+      async getProjects() {
+        if (this.isOnline) {
+          try {
+            const res = await fetch('/api/projects');
+            const data = await res.json();
+            if (data.success) return data.projects;
+          } catch(e){}
+        }
+        // 离线备选项目
+        const local = localStorage.getItem('festival_local_projects');
+        if (local) {
+          try { return JSON.parse(local); } catch(e){}
+        }
+        return [
+          {
+            id: 1,
+            title: '月华如愿 · 宵月游园雅集',
+            festivalId: 'mid_autumn',
+            description: '中秋追月经典游园雅集，融合灵兔捣药、古筝清音与万家灯火。',
+            config: {
+              bannerText: '祝天下华人中秋佳节团圆美满',
+              coupletLeft: '满地月华涵太液',
+              coupletRight: '一轮秋水照昆仑',
+              musicStyle: 'pentatonic_guzheng'
+            },
+            likes: 66, views: 128, authorNickname: '司岁御史', authorAvatar: '青龙'
+          },
+          {
+            id: 2,
+            title: '万里山河 · 国泰民安华彩展',
+            festivalId: 'national_day',
+            description: '国庆盛世主题，三军礼炮齐鸣，气球长卷与天安门金光闪耀。',
+            config: {
+              bannerText: '祝愿祖国繁荣昌盛，山河锦绣！',
+              coupletLeft: '九州日月开新纪',
+              coupletRight: '万仞江山展画屏',
+              musicStyle: 'brass_fanfare'
+            },
+            likes: 128, views: 356, authorNickname: '司岁御史', authorAvatar: '青龙'
+          },
+          {
+            id: 3,
+            title: '瑞狮腾骧 · 金玉满堂福星照',
+            festivalId: 'spring_festival',
+            description: '除夕新春定制项目，活泼南狮跃起，自定千祥春联，财神元宝天降。',
+            config: {
+              bannerText: '祝新春大吉，诸事顺遂，财源广进！',
+              coupletLeft: '九州日丽迎新岁',
+              coupletRight: '四海春温发泰亨',
+              musicStyle: 'firecracker_drum'
+            },
+            likes: 99, views: 240, authorNickname: '司岁御史', authorAvatar: '青龙'
+          },
+          {
+            id: 4,
+            title: '花市灯如昼 · 锦鲤跃波祈愿会',
+            festivalId: 'lantern_festival',
+            description: '上元灯节水云灯随波漫游，双尾锦鲤腾江破浪，千灯祈福。',
+            config: {
+              bannerText: '祝上元良宵，万家灯火通明，所求皆所愿！',
+              coupletLeft: '玉宇无尘千顷碧',
+              coupletRight: '银花有约万家春',
+              musicStyle: 'chime_bells'
+            },
+            likes: 77, views: 180, authorNickname: '司岁御史', authorAvatar: '青龙'
+          }
+        ];
+      }
+
+      // 获取四海祈愿
+      async getWishes() {
+        if (this.isOnline) {
+          try {
+            const res = await fetch('/api/wishes');
+            const data = await res.json();
+            if (data.success) return data.wishes;
+          } catch(e){}
+        }
+        return [
+          { id: 1, nickname: '司岁御史', avatar: '青龙', festival_id: 'national_day', content: '愿祖国山河无恙，繁荣昌盛，四海同春！', target_name: '华夏神州', likes: 88, created_at: '2026-09-28' },
+          { id: 2, nickname: '月下漫步者', avatar: '玉兔', festival_id: 'mid_autumn', content: '愿远方家人平安健康，岁岁有今日，年年有明月。', target_name: '全家亲朋', likes: 56, created_at: '2026-09-28' },
+          { id: 3, nickname: '春临九州', avatar: '瑞狮', festival_id: 'spring_festival', content: '愿新的一年事业顺利，所得皆所愿，万事顺意！', target_name: '全体同仁', likes: 72, created_at: '2026-09-28' },
+          { id: 4, nickname: '临水照花人', avatar: '金鲤', festival_id: 'lantern_festival', content: '愿灯火长明，喜乐常伴，千里共团圆。', target_name: '挚友知音', likes: 43, created_at: '2026-09-28' }
+        ];
+      }
+    }
+
+    function calculateLevelAndTitle(exp) {
+      const titles = [
+        { min: 0, level: 1, title: '岁时童生' },
+        { min: 100, level: 2, title: '踏月游侠' },
+        { min: 300, level: 3, title: '月华雅士' },
+        { min: 600, level: 4, title: '华夏鸿儒' },
+        { min: 1000, level: 5, title: '锦绣学士' },
+        { min: 1500, level: 6, title: '新春福星' },
+        { min: 2200, level: 7, title: '山河令使' },
+        { min: 3000, level: 8, title: '上元灯魁' },
+        { min: 4000, level: 9, title: '万象宗师' },
+        { min: 5000, level: 10, title: '岁时仙尊' }
+      ];
+      let res = titles[0];
+      for (const t of titles) {
+        if (exp >= t.min) res = t;
+        else break;
+      }
+      return res;
+    }
+
+    const dataMgr = new DataManager();
+
+    // ==========================================
+    // 3. 全局热度系统与阶段盛典 (Milestone Trigger)
+    // ==========================================
+    let currentHeat = 666;
+    let nextMilestone = 1000;
+
+    function addHeat(amount = 20) {
+      currentHeat += amount;
+      document.getElementById('hud-heat-val').textContent = currentHeat;
+
+      // 阶段盛典触发判断：每达 1000, 3000, 5000, 7000... 自动全景盛典
+      if (currentHeat >= nextMilestone) {
+        nextMilestone += 2000;
+        triggerGrandCelebration(true);
+        showExpToast(`🔥 热度突破 ${nextMilestone - 2000}！万象共鸣盛典自动引爆！`);
+      }
+    }
+
+    // ==========================================
+    // 4. 视觉画布与粒子渲染系统 (Canvas Engine)
+    // ==========================================
+    const canvas = document.getElementById('festival-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // 粒子集合
+    const fireworks = [];
+    const particles = [];
+    const riverLanterns = [];
+    const balloons = [];
+    const coins = [];
+    const osmanthusPetals = [];
+
+    // 当前节日主题
+    let currentFestival = 'mid_autumn';
+
+    // 节日特有状态
+    let moonPulse = 0;
+    let rabbitJumping = false;
+    let rabbitY = 0;
+    let buildingLevel = 1;
+    let lionDancing = false;
+    let drumVibration = 0;
+    let carpJumping = false;
+
+    class Firework {
+      constructor(x, y, targetY, color) {
+        this.x = x;
+        this.y = y;
+        this.targetY = targetY;
+        this.color = color || '#f5d77f';
+        this.exploded = false;
+        this.vy = -7 - Math.random() * 4;
+      }
+      update() {
+        if (!this.exploded) {
+          this.y += this.vy;
+          if (this.y <= this.targetY) {
+            this.explode();
+          }
+        }
+      }
+      explode() {
+        this.exploded = true;
+        const count = 60 + Math.floor(Math.random() * 40);
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1 + Math.random() * 6;
+          particles.push({
+            x: this.x,
+            y: this.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            alpha: 1,
+            decay: 0.012 + Math.random() * 0.015,
+            color: this.color,
+            size: 2 + Math.random() * 2
+          });
+        }
+      }
+      draw(c) {
+        if (!this.exploded) {
+          c.fillStyle = this.color;
+          c.fillRect(this.x - 1, this.y, 3, 10);
+        }
+      }
+    }
+
+    function spawnFirework(x, y) {
+      sound.playTone(300 + Math.random() * 200, 0.2, 'sawtooth', 0.15);
+      const startX = x || (width * 0.2 + Math.random() * width * 0.6);
+      const targetY = y || (height * 0.15 + Math.random() * height * 0.35);
+      const colors = ['#f5d77f', '#ff5722', '#e91e63', '#4caf50', '#00bcd4', '#ffeb3b'];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      fireworks.push(new Firework(startX, height, targetY, color));
+      addHeat(15);
+      dataMgr.addExp(15, '放飞烟花');
+    }
+
+    // 渲染背景与四大节日场景元素
+    function renderScene(c) {
+      // 1. 深邃夜空渐变
+      let grad = c.createLinearGradient(0, 0, 0, height);
+      if (currentFestival === 'mid_autumn') {
+        grad.addColorStop(0, '#060B19');
+        grad.addColorStop(0.6, '#0B1528');
+        grad.addColorStop(1, '#02040A');
+      } else if (currentFestival === 'national_day') {
+        grad.addColorStop(0, '#10172e');
+        grad.addColorStop(0.5, '#2b1016');
+        grad.addColorStop(1, '#0d0407');
+      } else if (currentFestival === 'spring_festival') {
+        grad.addColorStop(0, '#1a0505');
+        grad.addColorStop(0.6, '#2d0a0b');
+        grad.addColorStop(1, '#0d0001');
+      } else { // 上元灯会
+        grad.addColorStop(0, '#040d1a');
+        grad.addColorStop(0.5, '#07182e');
+        grad.addColorStop(1, '#01050c');
+      }
+      c.fillStyle = grad;
+      c.fillRect(0, 0, width, height);
+
+      // 2. 星汉闪烁
+      c.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      for (let i = 0; i < 40; i++) {
+        const sx = (Math.sin(i * 99 + Date.now() * 0.0005) * 0.5 + 0.5) * width;
+        const sy = (Math.cos(i * 33) * 0.5 + 0.5) * height * 0.5;
+        const sa = Math.sin(Date.now() * 0.002 + i) * 0.4 + 0.5;
+        c.globalAlpha = sa;
+        c.fillRect(sx, sy, 2, 2);
+      }
+      c.globalAlpha = 1;
+
+      // 3. 节日专属景致
+      if (currentFestival === 'mid_autumn') {
+        renderMidAutumnElements(c);
+      } else if (currentFestival === 'national_day') {
+        renderNationalDayElements(c);
+      } else if (currentFestival === 'spring_festival') {
+        renderSpringFestivalElements(c);
+      } else {
+        renderLanternFestivalElements(c);
+      }
+    }
+
+    // 中秋场景：皓魄满月、水波倒影、金桂玉兔
+    function renderMidAutumnElements(c) {
+      const moonX = width * 0.68;
+      const moonY = height * 0.26;
+      const moonR = Math.min(width, height) * 0.11;
+
+      // 月晕脉冲
+      if (moonPulse > 0) {
+        c.beginPath();
+        c.arc(moonX, moonY, moonR + moonPulse, 0, Math.PI * 2);
+        c.fillStyle = `rgba(255, 248, 220, ${0.4 * (1 - moonPulse / 150)})`;
+        c.fill();
+        moonPulse += 2;
+        if (moonPulse > 150) moonPulse = 0;
+      }
+
+      // 明月
+      const moonGrad = c.createRadialGradient(moonX - moonR * 0.3, moonY - moonR * 0.3, moonR * 0.1, moonX, moonY, moonR);
+      moonGrad.addColorStop(0, '#FFFDF8');
+      moonGrad.addColorStop(0.7, '#FFF8E7');
+      moonGrad.addColorStop(1, '#F3E5AB');
+      c.fillStyle = moonGrad;
+      c.beginPath();
+      c.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+      c.fill();
+
+      // 水波与倒影
+      const waterY = height * 0.72;
+      c.fillStyle = 'rgba(7, 16, 34, 0.9)';
+      c.fillRect(0, waterY, width, height - waterY);
+
+      // 水面月影波纹
+      for (let i = 0; i < 8; i++) {
+        const wy = waterY + 20 + i * 16;
+        const waveW = moonR * (1.2 + i * 0.3);
+        const wx = moonX + Math.sin(Date.now() * 0.002 + i) * 15;
+        c.fillStyle = `rgba(245, 215, 127, ${0.25 - i * 0.02})`;
+        c.fillRect(wx - waveW / 2, wy, waveW, 2);
+      }
+
+      // 左侧金桂古树剪影
+      c.fillStyle = '#0f172a';
+      c.beginPath();
+      c.moveTo(0, height);
+      c.lineTo(width * 0.18, height);
+      c.lineTo(width * 0.12, height * 0.4);
+      c.lineTo(0, height * 0.25);
+      c.fill();
+
+      // 动态玉兔
+      const rabbitX = width * 0.28;
+      const baseRY = height * 0.7 - 25;
+      const ry = baseRY + (rabbitJumping ? -Math.abs(Math.sin(Date.now() * 0.008)) * 30 : 0);
+
+      c.fillStyle = '#fff';
+      c.beginPath(); // 兔身
+      c.ellipse(rabbitX, ry, 18, 14, 0, 0, Math.PI * 2);
+      c.fill();
+      c.beginPath(); // 兔头
+      c.arc(rabbitX + 12, ry - 10, 10, 0, Math.PI * 2);
+      c.fill();
+      // 兔耳
+      c.fillRect(rabbitX + 10, ry - 26, 4, 16);
+      c.fillRect(rabbitX + 16, ry - 24, 4, 14);
+      // 红宝石眼睛
+      c.fillStyle = '#e53935';
+      c.fillRect(rabbitX + 16, ry - 11, 2, 2);
+
+      // 万家灯火楼阁 (筑阁等级)
+      if (buildingLevel >= 2) {
+        c.fillStyle = 'rgba(245, 215, 127, 0.4)';
+        for (let i = 0; i < buildingLevel * 3; i++) {
+          c.fillRect(width * 0.45 + i * 28, waterY - 30 - (i % 2) * 15, 12, 18);
+        }
+      }
+    }
+
+    // 国庆场景：天安门长城像素剪影、迎风红绸、金鼓与气球
+    function renderNationalDayElements(c) {
+      // 远山与长城剪影
+      c.fillStyle = '#1c0f15';
+      c.beginPath();
+      c.moveTo(0, height * 0.65);
+      for (let x = 0; x <= width; x += 40) {
+        c.lineTo(x, height * 0.65 + Math.sin(x * 0.01) * 30);
+      }
+      c.lineTo(width, height);
+      c.lineTo(0, height);
+      c.fill();
+
+      // 天安门城楼像素剪影
+      const gateW = Math.min(width * 0.45, 360);
+      const gateX = (width - gateW) / 2;
+      const gateY = height * 0.62;
+
+      c.fillStyle = '#c9372c';
+      c.fillRect(gateX, gateY, gateW, height * 0.18); // 主台基
+      c.fillStyle = '#f5d77f';
+      c.fillRect(gateX + gateW * 0.15, gateY - 22, gateW * 0.7, 22); // 重檐下层
+      c.fillRect(gateX + gateW * 0.25, gateY - 44, gateW * 0.5, 22); // 重檐上层
+
+      // 华表立柱
+      c.fillStyle = '#e2e8f0';
+      c.fillRect(gateX - 30, gateY - 50, 10, 80);
+      c.fillRect(gateX + gateW + 20, gateY - 50, 10, 80);
+
+      // 山河金鼓震颤光波
+      if (drumVibration > 0) {
+        c.strokeStyle = `rgba(245, 215, 127, ${drumVibration / 30})`;
+        c.lineWidth = 3;
+        c.beginPath();
+        c.arc(width * 0.18, height * 0.75, 40 + (30 - drumVibration) * 4, 0, Math.PI * 2);
+        c.stroke();
+        drumVibration -= 1;
+      }
+    }
+
+    // 新春场景：朱红门楼、瑞狮、元宝金币
+    function renderSpringFestivalElements(c) {
+      // 门楼横梁
+      c.fillStyle = '#801313';
+      c.fillRect(width * 0.15, height * 0.16, width * 0.7, 16);
+      c.fillStyle = '#f5d77f';
+      c.fillRect(width * 0.12, height * 0.14, width * 0.76, 8); // 飞檐
+
+      // 挂垂红灯笼
+      for (let i = 0; i < 4; i++) {
+        const lx = width * 0.22 + i * (width * 0.18);
+        c.fillStyle = '#e53935';
+        c.beginPath();
+        c.ellipse(lx, height * 0.24, 18, 22, 0, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = '#f5d77f';
+        c.fillRect(lx - 6, height * 0.24 - 24, 12, 4);
+        c.fillRect(lx - 4, height * 0.24 + 22, 8, 14); // 流苏
+      }
+
+      // 灵动南狮
+      const lionX = width * 0.5;
+      const lionY = height * 0.75 + (lionDancing ? Math.sin(Date.now() * 0.01) * 20 : 0);
+      c.fillStyle = '#f59e0b';
+      c.beginPath();
+      c.arc(lionX, lionY, 26, 0, Math.PI * 2); // 狮头
+      c.fill();
+      c.fillStyle = '#ef4444';
+      c.fillRect(lionX - 22, lionY + 20, 44, 20); // 狮身
+      // 狮眼
+      c.fillStyle = '#fff';
+      c.fillRect(lionX - 12, lionY - 6, 8, 8);
+      c.fillRect(lionX + 4, lionY - 6, 8, 8);
+      c.fillStyle = '#000';
+      c.fillRect(lionX - 8, lionY - 4, 4, 4);
+      c.fillRect(lionX + 8, lionY - 4, 4, 4);
+    }
+
+    // 上元灯会场景：水云河灯漂流、锦鲤破浪
+    function renderLanternFestivalElements(c) {
+      const riverY = height * 0.65;
+      c.fillStyle = '#041527';
+      c.fillRect(0, riverY, width, height - riverY);
+
+      // 水云灯舰队
+      for (let i = 0; i < 6; i++) {
+        const lx = (Date.now() * 0.02 + i * 160) % (width + 100) - 50;
+        const ly = riverY + 30 + (i % 3) * 25 + Math.sin(Date.now() * 0.003 + i) * 6;
+        c.fillStyle = 'rgba(255, 183, 77, 0.9)';
+        c.beginPath();
+        c.arc(lx, ly, 10, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = 'rgba(255, 235, 130, 0.4)';
+        c.beginPath();
+        c.arc(lx, ly, 22, 0, Math.PI * 2);
+        c.fill();
+      }
+
+      // 金鳞锦鲤腾跃
+      if (carpJumping) {
+        const cx = width * 0.45;
+        const cy = riverY - Math.abs(Math.sin(Date.now() * 0.005)) * 60;
+        c.fillStyle = '#ff7043';
+        c.beginPath();
+        c.ellipse(cx, cy, 20, 10, -Math.PI / 4, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = '#f5d77f';
+        c.fillRect(cx - 15, cy - 2, 8, 4); // 鱼尾
+      }
+    }
+
+    // 动画循环驱动
+    function animate() {
+      renderScene(ctx);
+
+      // 更新与绘制烟花
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        fireworks[i].update();
+        fireworks[i].draw(ctx);
+        if (fireworks[i].exploded) {
+          fireworks.splice(i, 1);
+        }
+      }
+
+      // 更新与绘制爆炸火星粒子
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.08; // 重力
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        } else {
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.size, p.size);
+          ctx.restore();
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    // ==========================================
+    // 5. 节日切换逻辑与专属玩法分发
+    // ==========================================
+    function switchFestival(festId) {
+      currentFestival = festId;
+
+      // 更新顶部 Dock 状态
+      document.querySelectorAll('.fest-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.fest === festId);
+      });
+
+      // 更新动态按键标签
+      const btn1 = document.getElementById('btn-fest-special-1');
+      const btn2 = document.getElementById('btn-fest-special-2');
+      const btn3 = document.getElementById('btn-fest-special-3');
+      const btn4 = document.getElementById('btn-fest-special-4');
+
+      if (festId === 'mid_autumn') {
+        btn1.innerHTML = '<span>🐰</span> 灵兔仙药 <span class="key-badge">R</span>';
+        btn2.innerHTML = '<span>🎋</span> 追月灵签 <span class="key-badge">J</span>';
+        btn3.innerHTML = '<span>🏮</span> 猜灯谜 <span class="key-badge">T</span>';
+        btn4.innerHTML = '<span>📜</span> 赏灯筑阁 <span class="key-badge">K</span>';
+        document.getElementById('couplet-left').textContent = '满地月华涵太液';
+        document.getElementById('couplet-right').textContent = '一轮秋水照昆仑';
+        document.getElementById('project-banner').textContent = '祝天下华人中秋良宵，月圆人圆，诸事顺遂！';
+        sound.playGuzhengNote(2);
+      } else if (festId === 'national_day') {
+        btn1.innerHTML = '<span>🎈</span> 庆典气球 <span class="key-badge">B</span>';
+        btn2.innerHTML = '<span>🥁</span> 山河金鼓 <span class="key-badge">D</span>';
+        btn3.innerHTML = '<span>🏮</span> 华夏问答 <span class="key-badge">T</span>';
+        btn4.innerHTML = '<span>📜</span> 礼炮致礼 <span class="key-badge">K</span>';
+        document.getElementById('couplet-left').textContent = '九州日月开新纪';
+        document.getElementById('couplet-right').textContent = '万仞江山展画屏';
+        document.getElementById('project-banner').textContent = '盛世华诞 · 祝愿祖国繁荣昌盛，山河锦绣！';
+        sound.playArtillery();
+      } else if (festId === 'spring_festival') {
+        btn1.innerHTML = '<span>🦁</span> 瑞狮腾骧 <span class="key-badge">L</span>';
+        btn2.innerHTML = '<span>🧧</span> 财神进宝 <span class="key-badge">F</span>';
+        btn3.innerHTML = '<span>🏮</span> 新春问答 <span class="key-badge">T</span>';
+        btn4.innerHTML = '<span>📜</span> 更换春联 <span class="key-badge">C</span>';
+        document.getElementById('couplet-left').textContent = '九州日丽迎新岁';
+        document.getElementById('couplet-right').textContent = '四海春温发泰亨';
+        document.getElementById('project-banner').textContent = '金龙呈祥 · 辞旧迎新，祝诸君新春吉祥，阖家安泰！';
+        sound.playFirecracker();
+      } else { // 上元灯会
+        btn1.innerHTML = '<span>🎏</span> 锦鲤腾浪 <span class="key-badge">F</span>';
+        btn2.innerHTML = '<span>🪔</span> 放水云灯 <span class="key-badge">B</span>';
+        btn3.innerHTML = '<span>🏮</span> 上元灯谜 <span class="key-badge">T</span>';
+        btn4.innerHTML = '<span>📜</span> 千灯祈福 <span class="key-badge">K</span>';
+        document.getElementById('couplet-left').textContent = '玉宇无尘千顷碧';
+        document.getElementById('couplet-right').textContent = '银花有约万家春';
+        document.getElementById('project-banner').textContent = '花市灯如昼 · 祝上元佳节灯火长明，吉庆常在！';
+        sound.playChime();
+      }
+
+      dataMgr.addExp(20, `游历${festId}`);
+    }
+
+    // 绑定节日选择点击
+    document.querySelectorAll('.fest-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchFestival(btn.dataset.fest);
+      });
+    });
+
+    // ==========================================
+    // 6. 华彩盛典万象齐鸣 (Grand Celebration)
+    // ==========================================
+    function triggerGrandCelebration(isAuto = false) {
+      sound.playArtillery();
+      moonPulse = 1;
+      rabbitJumping = true;
+      lionDancing = true;
+      drumVibration = 30;
+      carpJumping = true;
+
+      // 连续发射连珠盛典烟花
+      for (let i = 0; i < 12; i++) {
+        setTimeout(() => {
+          spawnFirework(
+            width * 0.15 + Math.random() * width * 0.7,
+            height * 0.12 + Math.random() * height * 0.35
+          );
+        }, i * 180);
+      }
+
+      addHeat(334);
+      dataMgr.addExp(80, '万象共鸣盛典');
+
+      setTimeout(() => {
+        rabbitJumping = false;
+        lionDancing = false;
+        carpJumping = false;
+      }, 8000);
+    }
+
+    document.getElementById('btn-grand-celebrate').addEventListener('click', () => triggerGrandCelebration(false));
+    document.getElementById('btn-firework').addEventListener('click', () => spawnFirework());
+
+    // ==========================================
+    // 7. 灵签、灯谜、祈愿弹窗触发
+    // ==========================================
+    const DIVINATIONS = [
+      { title: '【上上签 · 月华如愿】', poem: '清辉凝碧汉，金桂拂云香。\n所求皆所愿，四海共安康。', buff: '月华脉冲增强 300%' },
+      { title: '【大吉签 · 蟾宫折桂】', poem: '仙树凌霄发，秋风送好音。\n功名今得遇，万里遂初心。', buff: '全域答题经验 +50%' },
+      { title: '【上上签 · 万家灯火】', poem: '星河垂四野，千户起祥烟。\n福泽绵长在，人月两团圆。', buff: '全域夜景繁华度满级' },
+      { title: '【上吉签 · 山河壮丽】', poem: '红旗卷长空，四海庆安澜。\n九州开盛世，日月万年欢。', buff: '礼炮连珠自动响应' },
+      { title: '【大吉签 · 紫气东来】', poem: '喜鹊登高树，春风入户庭。\n门迎百千福，富贵自生成。', buff: '全域金币流光长驻' }
+    ];
+
+    function triggerDivination() {
+      sound.playChime();
+      const item = DIVINATIONS[Math.floor(Math.random() * DIVINATIONS.length)];
+      document.getElementById('divine-modal-title').textContent = item.title;
+      document.getElementById('divine-modal-poem').innerHTML = item.poem.replace('\n', '<br>');
+      document.getElementById('divine-modal-buff').textContent = `已激活全域祥瑞 Buff: ${item.buff}`;
+      document.getElementById('divination-modal').showModal();
+      dataMgr.addExp(30, '摇签求卜');
+      addHeat(30);
+    }
+
+    const RIDDLES = [
+      { q: '云开月露（打一字）', options: ['胆', '朋', '明', '朝'], ans: 0, exp: '“云”散开见“月”，两月为朋，云露月为胆。' },
+      { q: '千里共婵娟（打一字）', options: ['仙', '皓', '婵', '婵'], ans: 0, exp: '“千里”为重，合为仙。' },
+      { q: '守岁到天明（打一成语）', options: ['除旧迎新', '通宵达旦', '通力合作', '坐以待旦'], ans: 0, exp: '除夕夜守岁即为除旧岁迎新年。' },
+      { q: '元宵月夜照花街（打一南宋词人）', options: ['辛弃疾', '苏轼', '李清照', '陆游'], ans: 0, exp: '东风夜放花千树，更吹落，星如雨，出自辛弃疾《青玉案·元夕》。' }
+    ];
+    let currentRiddleIdx = 0;
+
+    function openRiddleModal() {
+      currentRiddleIdx = Math.floor(Math.random() * RIDDLES.length);
+      renderRiddle();
+      document.getElementById('riddle-modal').showModal();
+    }
+
+    function renderRiddle() {
+      const r = RIDDLES[currentRiddleIdx];
+      document.getElementById('riddle-question').textContent = r.q;
+      const container = document.getElementById('riddle-options-container');
+      container.innerHTML = '';
+      document.getElementById('riddle-feedback').style.display = 'none';
+
+      r.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-secondary';
+        btn.style.textAlign = 'left';
+        btn.textContent = `${['A', 'B', 'C', 'D'][idx]}. ${opt}`;
+        btn.onclick = () => submitRiddleAnswer(idx);
+        container.appendChild(btn);
+      });
+    }
+
+    function submitRiddleAnswer(userPick) {
+      const r = RIDDLES[currentRiddleIdx];
+      const feedback = document.getElementById('riddle-feedback');
+      feedback.style.display = 'block';
+
+      if (userPick === r.ans) {
+        feedback.style.color = '#4caf50';
+        feedback.textContent = `✓ 恭喜答对！${r.exp}`;
+        sound.playTone(880, 0.3, 'triangle', 0.25);
+        addHeat(50);
+        dataMgr.addExp(40, '灯谜通关');
+        spawnFirework();
+      } else {
+        feedback.style.color = '#ef4444';
+        feedback.textContent = `✕ 惜哉未中！正确答案为：${r.options[r.ans]}`;
+        sound.playTone(200, 0.3, 'sawtooth', 0.15);
+      }
+    }
+
+    function nextRiddle() {
+      currentRiddleIdx = (currentRiddleIdx + 1) % RIDDLES.length;
+      renderRiddle();
+    }
+
+    function openWishComposer() {
+      document.getElementById('wish-modal').showModal();
+    }
+
+    function handleSendWish(e) {
+      e.preventDefault();
+      const target = document.getElementById('wish-target').value;
+      const content = document.getElementById('wish-content').value;
+      document.getElementById('wish-modal').close();
+
+      // 发射祈愿天灯
+      sound.playChime();
+      showExpToast('🎐 祈愿天灯已放飞，心愿已载入四海长生册！');
+      addHeat(50);
+      dataMgr.addExp(40, '放飞天灯');
+      spawnFirework();
+    }
+
+    // 绑定专属按钮
+    document.getElementById('btn-fest-special-1').addEventListener('click', () => {
+      if (currentFestival === 'mid_autumn') {
+        rabbitJumping = true;
+        sound.playGuzhengNote(3);
+        setTimeout(() => rabbitJumping = false, 3000);
+      } else if (currentFestival === 'national_day') {
+        showExpToast('🎈 庆典气球腾空漫游！');
+        spawnFirework();
+      } else if (currentFestival === 'spring_festival') {
+        lionDancing = true;
+        sound.playFirecracker();
+        setTimeout(() => lionDancing = false, 4000);
+      } else {
+        carpJumping = true;
+        sound.playChime();
+        setTimeout(() => carpJumping = false, 3000);
+      }
+      addHeat(25);
+    });
+
+    document.getElementById('btn-fest-special-2').addEventListener('click', triggerDivination);
+    document.getElementById('btn-fest-special-3').addEventListener('click', openRiddleModal);
+    document.getElementById('btn-fest-special-4').addEventListener('click', () => {
+      if (currentFestival === 'mid_autumn') {
+        buildingLevel = (buildingLevel % 4) + 1;
+        showExpToast(`🏮 繁华度进阶：当前为【${['幽夜清辉', '华灯初上', '宵市盛会', '万家灯火'][buildingLevel - 1]}】`);
+        sound.playGuzhengNote(buildingLevel);
+      } else {
+        triggerGrandCelebration();
+      }
+      addHeat(30);
+    });
+
+    document.getElementById('btn-wish').addEventListener('click', openWishComposer);
+    document.getElementById('btn-guide').addEventListener('click', () => {
+      document.getElementById('guide-modal').showModal();
+    });
+
+    // 移动端专用触发
+    document.getElementById('m-btn-fest').addEventListener('click', () => {
+      const fests = ['mid_autumn', 'national_day', 'spring_festival', 'lantern_festival'];
+      const next = fests[(fests.indexOf(currentFestival) + 1) % fests.length];
+      switchFestival(next);
+    });
+    document.getElementById('m-btn-firework').addEventListener('click', () => spawnFirework());
+    document.getElementById('m-btn-grand').addEventListener('click', () => triggerGrandCelebration());
+    document.getElementById('m-btn-interact').addEventListener('click', triggerDivination);
+    document.getElementById('m-btn-profile').addEventListener('click', () => {
+      openProjectMgrModal();
+    });
+
+    // ==========================================
+    // 8. 个人管理中心与工坊交互
+    // ==========================================
+    const projectMgrModal = document.getElementById('project-mgr-modal');
+    document.getElementById('project-mgr-btn').addEventListener('click', openProjectMgrModal);
+
+    async function openProjectMgrModal() {
+      projectMgrModal.showModal();
+      loadProjectCards();
+      loadWishesList();
+      loadDivinationVault();
+      loadAchievementsHall();
+    }
+
+    async function loadProjectCards() {
+      const container = document.getElementById('project-cards-container');
+      container.innerHTML = '<div style="color:rgba(255,255,255,0.6);">正在载入庆典项目...</div>';
+      const projects = await dataMgr.getProjects();
+      container.innerHTML = '';
+
+      projects.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        card.innerHTML = `
+          <div>
+            <div class="project-title">
+              <span>${p.title}</span>
+              <span class="key-badge">${p.festivalId}</span>
+            </div>
+            <div class="project-desc">${p.description || '自定节日庆典空间'}</div>
+          </div>
+          <div class="project-meta">
+            <span>作者: ${p.authorNickname || '雅士'}</span>
+            <span>❤️ ${p.likes || 0} 点赞</span>
+          </div>
+          <div class="project-card-actions">
+            <button class="btn-primary" style="flex:1; padding:6px 10px; font-size:12px;" onclick="applyProjectConfig(${p.id})">立即激活</button>
+            <button class="btn-secondary" style="padding:6px 10px; font-size:12px;" onclick="likeProjectItem(${p.id})">❤️</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function loadWishesList() {
+      const container = document.getElementById('wishes-list-container');
+      const wishes = await dataMgr.getWishes();
+      container.innerHTML = '';
+
+      wishes.forEach(w => {
+        const item = document.createElement('div');
+        item.style.background = 'rgba(255,255,255,0.06)';
+        item.style.border = '1px solid rgba(245,215,127,0.2)';
+        item.style.borderRadius = '8px';
+        item.style.padding = '12px 16px';
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="font-weight:bold; color:var(--gold-bright); font-size:13px;">${w.nickname} 寄愿【${w.target_name}】:</span>
+            <span style="font-size:11px; color:rgba(255,255,255,0.5);">${w.created_at ? w.created_at.slice(0,10) : '今日'}</span>
+          </div>
+          <p style="font-size:13px; color:#e2e8f0; line-height:1.5;">${w.content}</p>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function loadDivinationVault() {
+      const container = document.getElementById('divination-cards-container');
+      container.innerHTML = '';
+      DIVINATIONS.forEach(d => {
+        const card = document.createElement('div');
+        card.className = 'divine-card';
+        card.innerHTML = `
+          <div class="divine-title">${d.title}</div>
+          <div class="divine-poem">${d.poem.replace('\n', '<br>')}</div>
+          <span style="font-size:11px; color:var(--gold-bright); margin-top:6px;">Buff: ${d.buff}</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    const ACHIEVEMENTS = [
+      { id: 'first_firework', title: '初试锋芒', desc: '点燃第一枚节日庆典烟花', icon: '🎆', unlocked: true },
+      { id: 'grand_celebration', title: '万象共鸣', desc: '触发一次全景大盛典 [ENTER]', icon: '🌟', unlocked: true },
+      { id: 'divine_fortune', title: '蟾宫折桂', desc: '完成一次岁时祈福摇签', icon: '🎋', unlocked: true },
+      { id: 'riddle_scholar', title: '灯市魁首', desc: '答对任意 3 道灯谜或问答', icon: '🏮', unlocked: false },
+      { id: 'wish_sent', title: '天灯寄情', desc: '放飞一盏祈愿天灯或水云灯', icon: '🎐', unlocked: true },
+      { id: 'custom_project', title: '鲁班巧匠', desc: '在庆典工坊创建并激活项目', icon: '🏛️', unlocked: false },
+      { id: 'heat_master', title: '热度如潮', desc: '贡献超过 1000 点节庆热度', icon: '🔥', unlocked: false },
+      { id: 'festive_master', title: '四海同春', desc: '游历体验全部 4 大节日主题', icon: '👑', unlocked: true }
+    ];
+
+    function loadAchievementsHall() {
+      const container = document.getElementById('achievement-cards-container');
+      container.innerHTML = '';
+      ACHIEVEMENTS.forEach(a => {
+        const card = document.createElement('div');
+        card.className = `achievement-card ${a.unlocked ? 'unlocked' : ''}`;
+        card.innerHTML = `
+          <div class="achievement-icon">${a.icon}</div>
+          <div class="achievement-info">
+            <h4>${a.title}</h4>
+            <p>${a.desc}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 模态框选项卡切换
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+        document.getElementById(target).style.display = 'block';
+      });
+    });
+
+    // 激活自定义项目到 live 场景
+    window.applyProjectConfig = async function(projectId) {
+      const projects = await dataMgr.getProjects();
+      const p = projects.find(item => item.id === projectId);
+      if (!p) return;
+
+      if (p.config) {
+        if (p.config.bannerText) document.getElementById('project-banner').textContent = p.config.bannerText;
+        if (p.config.coupletLeft) document.getElementById('couplet-left').textContent = p.config.coupletLeft;
+        if (p.config.coupletRight) document.getElementById('couplet-right').textContent = p.config.coupletRight;
+      }
+      if (p.festivalId) switchFestival(p.festivalId);
+
+      projectMgrModal.close();
+      showExpToast(`🏛️ 已成功激活庆典项目：【${p.title}】！`);
+      dataMgr.addExp(50, '工坊项目激活');
+      triggerGrandCelebration();
+    };
+
+    window.likeProjectItem = function(projectId) {
+      showExpToast('❤️ 感谢您的点赞祈福！');
+      addHeat(20);
+    };
+
+    // 新建项目弹窗
+    document.getElementById('btn-create-project-open').addEventListener('click', () => {
+      document.getElementById('create-project-modal').showModal();
+    });
+
+    window.handleCreateProjectSubmit = async function(e) {
+      e.preventDefault();
+      const title = document.getElementById('cp-title').value;
+      const festivalId = document.getElementById('cp-festival').value;
+      const banner = document.getElementById('cp-banner').value;
+      const cLeft = document.getElementById('cp-couplet-left').value || '满地月华涵太液';
+      const cRight = document.getElementById('cp-couplet-right').value || '一轮秋水照昆仑';
+      const desc = document.getElementById('cp-desc').value;
+
+      document.getElementById('create-project-modal').close();
+
+      // 应用配置
+      document.getElementById('project-banner').textContent = banner;
+      document.getElementById('couplet-left').textContent = cLeft;
+      document.getElementById('couplet-right').textContent = cRight;
+      switchFestival(festivalId);
+
+      showExpToast(`🎉 自定义庆典【${title}】创建成功并已激活！`);
+      dataMgr.addExp(80, '工坊创建项目');
+      triggerGrandCelebration();
+    };
+
+    // ==========================================
+    // 9. 账户系统与用户登录/注册
+    // ==========================================
+    const accountModal = document.getElementById('account-modal');
+    document.getElementById('user-pill').addEventListener('click', () => {
+      accountModal.showModal();
+    });
+
+    function updateUserUI() {
+      const u = dataMgr.currentUser;
+      if (!u) return;
+      document.getElementById('hud-username').textContent = u.nickname || u.username;
+      document.getElementById('hud-title').textContent = u.title || '岁时童生';
+      const avatarMap = { '玉兔':'🐰', '瑞狮':'🦁', '金鲤':'🎏', '青龙':'🐉', '朱雀':'🦚', '麒麟':'🦄', '玄武':'🐢', '灵鹿':'🦌' };
+      const icon = avatarMap[u.avatar] || '🐰';
+      document.getElementById('hud-avatar').textContent = icon;
+      document.getElementById('prof-avatar-big').textContent = icon;
+      document.getElementById('prof-name').textContent = u.nickname;
+      document.getElementById('prof-title').textContent = u.title;
+      document.getElementById('prof-exp-text').textContent = `当前修行: ${u.exp} EXP`;
+
+      // 切换登录状态面板
+      if (dataMgr.token || dataMgr.currentUser) {
+        document.getElementById('tab-btn-profile').style.display = 'block';
+      }
+    }
+
+    // 登录 / 注册 / 个人选项卡
+    document.querySelectorAll('.tab-btn[data-auth-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn[data-auth-tab]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.authTab;
+        document.getElementById('form-login').style.display = target === 'pane-login' ? 'block' : 'none';
+        document.getElementById('form-register').style.display = target === 'pane-register' ? 'block' : 'none';
+        document.getElementById('pane-profile').style.display = target === 'pane-profile' ? 'block' : 'none';
+      });
+    });
+
+    // 头像选择器
+    document.querySelectorAll('.avatar-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+      });
+    });
+
+    window.handleLoginSubmit = async function(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+
+      if (dataMgr.isOnline) {
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await res.json();
+          if (data.success) {
+            dataMgr.token = data.token;
+            dataMgr.currentUser = data.user;
+            localStorage.setItem('festival_auth_token', data.token);
+            updateUserUI();
+            accountModal.close();
+            showExpToast(`🎉 欢迎归来，${data.user.nickname}！`);
+            return;
+          } else {
+            alert(data.error || '登录失败');
+            return;
+          }
+        } catch(e){}
+      }
+
+      // 离线模拟登录
+      dataMgr.currentUser = {
+        id: 1, username, nickname: username, avatar: '青龙', title: '月华雅士', exp: 320, level: 3
+      };
+      localStorage.setItem('festival_local_user', JSON.stringify(dataMgr.currentUser));
+      updateUserUI();
+      accountModal.close();
+      showExpToast(`🎉 离线模式已登录：${username}`);
+    };
+
+    window.handleRegisterSubmit = async function(e) {
+      e.preventDefault();
+      const username = document.getElementById('reg-username').value;
+      const nickname = document.getElementById('reg-nickname').value;
+      const password = document.getElementById('reg-password').value;
+      const avatarEl = document.querySelector('.avatar-option.selected');
+      const avatar = avatarEl ? avatarEl.dataset.avatar : '玉兔';
+
+      if (dataMgr.isOnline) {
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, nickname, avatar })
+          });
+          const data = await res.json();
+          if (data.success) {
+            dataMgr.token = data.token;
+            dataMgr.currentUser = data.user;
+            localStorage.setItem('festival_auth_token', data.token);
+            updateUserUI();
+            accountModal.close();
+            showExpToast(`🎉 恭迎新雅士【${nickname}】入驻华节盛典！`);
+            return;
+          } else {
+            alert(data.error || '注册失败');
+            return;
+          }
+        } catch(e){}
+      }
+
+      // 离线模式注册
+      dataMgr.currentUser = { id: Date.now(), username, nickname, avatar, title: '岁时童生', exp: 100, level: 2 };
+      localStorage.setItem('festival_local_user', JSON.stringify(dataMgr.currentUser));
+      updateUserUI();
+      accountModal.close();
+      showExpToast(`🎉 注册成功！恭迎【${nickname}】！`);
+    };
+
+    window.handleGuestLogin = async function() {
+      if (dataMgr.isOnline) {
+        try {
+          const res = await fetch('/api/auth/guest', { method: 'POST' });
+          const data = await res.json();
+          if (data.success) {
+            dataMgr.token = data.token;
+            dataMgr.currentUser = data.user;
+            localStorage.setItem('festival_auth_token', data.token);
+            updateUserUI();
+            accountModal.close();
+            showExpToast(`⚡ 游客体验开启：${data.user.nickname}`);
+            return;
+          }
+        } catch(e){}
+      }
+
+      dataMgr.loadLocalUser();
+      accountModal.close();
+      showExpToast('⚡ 游客体验已就绪！');
+    };
+
+    window.handleLogout = function() {
+      dataMgr.token = null;
+      localStorage.removeItem('festival_auth_token');
+      dataMgr.loadLocalUser();
+      accountModal.close();
+      showExpToast('已登出账户');
+    };
+
+    // ==========================================
+    // 10. 音效切换、全屏与飘字反馈
+    // ==========================================
+    document.getElementById('sound-chip').addEventListener('click', () => {
+      sound.enabled = !sound.enabled;
+      document.getElementById('sound-state').textContent = sound.enabled ? '开' : '关';
+      document.getElementById('sound-icon').textContent = sound.enabled ? '🎵' : '🔇';
+      if (sound.enabled) sound.playGuzhengNote(0);
+    });
+
+    document.getElementById('fullscreen-btn').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(()=>{});
+      } else {
+        document.exitFullscreen().catch(()=>{});
+      }
+    });
+
+    let toastTimer = null;
+    function showExpToast(msg) {
+      const toast = document.getElementById('exp-toast');
+      document.getElementById('exp-toast-text').textContent = msg;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    // ==========================================
+    // 11. 全局键盘热键监听 (Keyboard Shortcuts)
+    // ==========================================
+    window.addEventListener('keydown', (e) => {
+      // 若处于输入框中则不触发全局热键
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+        return;
+      }
+
+      const key = e.key.toUpperCase();
+
+      if (key === 'ENTER') {
+        e.preventDefault();
+        triggerGrandCelebration();
+      } else if (key === ' ') {
+        e.preventDefault();
+        spawnFirework();
+      } else if (key === '1') {
+        switchFestival('mid_autumn');
+      } else if (key === '2') {
+        switchFestival('national_day');
+      } else if (key === '3') {
+        switchFestival('spring_festival');
+      } else if (key === '4') {
+        switchFestival('lantern_festival');
+      } else if (key === 'TAB') {
+        e.preventDefault();
+        const fests = ['mid_autumn', 'national_day', 'spring_festival', 'lantern_festival'];
+        const next = fests[(fests.indexOf(currentFestival) + 1) % fests.length];
+        switchFestival(next);
+      } else if (key === 'J') {
+        triggerDivination();
+      } else if (key === 'T') {
+        openRiddleModal();
+      } else if (key === 'W') {
+        openWishComposer();
+      } else if (key === 'H') {
+        document.getElementById('guide-modal').showModal();
+      } else if (key === 'I') {
+        openAgentModal();
+      } else if (key === 'R' || key === 'L' || key === 'B' || key === 'D' || key === 'F' || key === 'K') {
+        document.getElementById('btn-fest-special-1').click();
+      }
+    });
+
+    // 模态框背景点击轻量关闭兼容逻辑 (Modern Light-Dismiss Fallback)
+    document.querySelectorAll('dialog').forEach(dlg => {
+      if (!('closedBy' in HTMLDialogElement.prototype)) {
+        dlg.addEventListener('click', (event) => {
+          if (event.target !== dlg) return;
+          const rect = dlg.getBoundingClientRect();
+          const inDialog = (
+            rect.top <= event.clientY &&
+            event.clientY <= rect.top + rect.height &&
+            rect.left <= event.clientX &&
+            event.clientX <= rect.left + rect.width
+          );
+          if (!inDialog) dlg.close();
+        });
+      }
+    });
+
+    // ==========================================
+    // 12. 岁时司律灵仙 · AI 智能决策中枢客户端逻辑
+    // ==========================================
+    const agentModal = document.getElementById('agent-modal');
+    const agentMessages = document.getElementById('agent-messages');
+
+    function openAgentModal() {
+      agentModal.showModal();
+    }
+
+    document.getElementById('btn-agent-open-top').addEventListener('click', openAgentModal);
+    document.getElementById('btn-agent-open-bottom').addEventListener('click', openAgentModal);
+    document.getElementById('m-btn-agent').addEventListener('click', openAgentModal);
+
+    window.sendAgentQuick = function(promptText) {
+      document.getElementById('agent-input').value = promptText;
+      handleAgentSubmit(new Event('submit'));
+    };
+
+    window.handleAgentSubmit = async function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const inputEl = document.getElementById('agent-input');
+      const text = inputEl.value.trim();
+      if (!text) return;
+      inputEl.value = '';
+
+      // 渲染用户输入泡泡
+      appendAgentMessage('user', text);
+
+      // 请求服务端智能体或本地规则引擎
+      let responseData = null;
+      if (dataMgr.isOnline) {
+        try {
+          const res = await fetch('/api/agent/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': dataMgr.token ? `Bearer ${dataMgr.token}` : ''
+            },
+            body: JSON.stringify({ prompt: text, festival: currentFestival })
+          });
+          const json = await res.json();
+          if (json.success) responseData = json;
+        } catch(e){}
+      }
+
+      // 离线环境本地智能体推理兜底
+      if (!responseData) {
+        responseData = localAgentReasoning(text);
+      }
+
+      // 渲染智能体回复与思考过程
+      appendAgentMessage('bot', responseData.reply, responseData.thought, responseData.actions);
+
+      // 调度执行智能体决策出来的各模块动作 (Function Calling 执行)
+      if (responseData.actions && responseData.actions.length > 0) {
+        executeAgentActions(responseData.actions);
+      }
+
+      dataMgr.addExp(40, '智能体交互协同');
+      addHeat(30);
+    };
+
+    function appendAgentMessage(sender, text, thought = '', actions = []) {
+      const bubble = document.createElement('div');
+      bubble.className = `agent-msg-bubble ${sender === 'user' ? 'agent-msg-user' : 'agent-msg-bot'}`;
+
+      if (thought) {
+        const thoughtEl = document.createElement('div');
+        thoughtEl.className = 'agent-thought-block';
+        thoughtEl.textContent = `🧠 ${thought}`;
+        bubble.appendChild(thoughtEl);
+      }
+
+      const textEl = document.createElement('div');
+      textEl.textContent = text;
+      bubble.appendChild(textEl);
+
+      if (actions && actions.length > 0) {
+        const actWrap = document.createElement('div');
+        actWrap.style.marginTop = '6px';
+        actions.forEach(a => {
+          const badge = document.createElement('span');
+          badge.className = 'agent-action-badge';
+          badge.textContent = `⚡ 协同调度: ${a.type}`;
+          actWrap.appendChild(badge);
+        });
+        bubble.appendChild(actWrap);
+      }
+
+      agentMessages.appendChild(bubble);
+      agentMessages.scrollTop = agentMessages.scrollHeight;
+    }
+
+    function executeAgentActions(actions) {
+      actions.forEach(act => {
+        if (act.type === 'switch_festival') {
+          switchFestival(act.payload);
+        } else if (act.type === 'update_couplets') {
+          if (act.payload.left) document.getElementById('couplet-left').textContent = act.payload.left;
+          if (act.payload.right) document.getElementById('couplet-right').textContent = act.payload.right;
+        } else if (act.type === 'update_banner') {
+          document.getElementById('project-banner').textContent = act.payload;
+        } else if (act.type === 'trigger_effect') {
+          if (act.payload === 'grand_celebration') {
+            triggerGrandCelebration();
+          } else if (act.payload === 'firework') {
+            spawnFirework();
+          } else if (act.payload === 'divination') {
+            triggerDivination();
+          }
+        }
+      });
+    }
+
+    // 离线本地文化推理智能体
+    function localAgentReasoning(text) {
+      let festival = currentFestival;
+      if (text.includes('国庆') || text.includes('祖国') || text.includes('山河') || text.includes('礼炮')) festival = 'national_day';
+      else if (text.includes('新春') || text.includes('除夕') || text.includes('发财') || text.includes('狮')) festival = 'spring_festival';
+      else if (text.includes('元宵') || text.includes('上元') || text.includes('锦鲤') || text.includes('河灯')) festival = 'lantern_festival';
+      else if (text.includes('中秋') || text.includes('月') || text.includes('兔')) festival = 'mid_autumn';
+
+      const actions = [{ type: 'switch_festival', payload: festival }];
+      let reply = '';
+      let thought = `【离线推理】识别用户意图归属【${festival}】场景，匹配传统意象并编排视听模块。`;
+
+      if (text.includes('联') || text.includes('对子') || text.includes('寿') || text.includes('财')) {
+        const couplets = {
+          mid_autumn: { left: '皓月清辉延鹤算', right: '金风玉露驻仙龄', banner: '中秋良宵 · 福寿康宁' },
+          national_day: { left: '九州日月开新纪', right: '万仞江山展画屏', banner: '盛世华诞 · 锦绣山河' },
+          spring_festival: { left: '财源似水流长盛', right: '事业如春万象新', banner: '辞旧迎新 · 富贵吉祥' },
+          lantern_festival: { left: '玉宇无尘千顷碧', right: '银花有约万家春', banner: '花市灯如昼 · 上元良宵' }
+        }[festival];
+        actions.push({ type: 'update_couplets', payload: couplets });
+        actions.push({ type: 'update_banner', payload: couplets.banner });
+        actions.push({ type: 'trigger_effect', payload: 'firework' });
+        reply = `已为您谱得吉祥雅联！上联：“${couplets.left}”，下联：“${couplets.right}”。门楼匾额已换为【${couplets.banner}】！`;
+      } else {
+        actions.push({ type: 'trigger_effect', payload: 'grand_celebration' });
+        reply = `收到！司律灵仙已调动全景盛典，礼炮与连珠烟花已同框绽放，为您与四海同胞庆贺！`;
+      }
+
+      return { reply, thought, actions, festival };
+    }
+
+    // ==========================================
+    // 13. 自动演示模式 (Auto-Demo Mode - 竞赛录屏专用)
+    // ==========================================
+    let autoDemoRunning = false;
+    document.getElementById('btn-start-autodemo').addEventListener('click', startAutoDemo);
+
+    function startAutoDemo() {
+      if (autoDemoRunning) return;
+      autoDemoRunning = true;
+      agentModal.close();
+      showExpToast('▶ 智能体全景自动演示录屏模式已启动！');
+
+      const steps = [
+        { time: 1000, act: () => { switchFestival('mid_autumn'); showExpToast('【第一幕】中秋追月 · 皓魄满月与古筝雅调'); } },
+        { time: 4000, act: () => { spawnFirework(); } },
+        { time: 7000, act: () => {
+            document.getElementById('couplet-left').textContent = '满地月华涵太液';
+            document.getElementById('couplet-right').textContent = '一轮秋水照昆仑';
+            document.getElementById('project-banner').textContent = 'AI智能体：已为游园雅士谱就中秋对联';
+            triggerGrandCelebration();
+          }
+        },
+        { time: 14000, act: () => { switchFestival('national_day'); showExpToast('【第二幕】盛世国庆 · 长城剪影与三军礼炮'); } },
+        { time: 17000, act: () => {
+            sound.playArtillery();
+            spawnFirework();
+            document.getElementById('project-banner').textContent = 'AI智能体：为祖国山河华诞献礼，礼炮齐鸣！';
+          }
+        },
+        { time: 24000, act: () => { switchFestival('spring_festival'); showExpToast('【第三幕】新春除夕 · 瑞狮起舞与财神元宝雨'); } },
+        { time: 27000, act: () => {
+            sound.playFirecracker();
+            lionDancing = true;
+            document.getElementById('couplet-left').textContent = '财源似水流长盛';
+            document.getElementById('couplet-right').textContent = '事业如春万象新';
+            triggerGrandCelebration();
+          }
+        },
+        { time: 34000, act: () => { switchFestival('lantern_festival'); showExpToast('【第四幕】上元灯会 · 水云灯游弋与锦鲤破浪'); } },
+        { time: 37000, act: () => {
+            carpJumping = true;
+            sound.playChime();
+            triggerGrandCelebration();
+          }
+        },
+        { time: 44000, act: () => {
+            openProjectMgrModal();
+            showExpToast('【第五幕】庆典工坊、祈愿长生册与万象成就殿');
+          }
+        },
+        { time: 52000, act: () => {
+            projectMgrModal.close();
+            openAgentModal();
+            showExpToast('【第六幕】岁时司律灵仙 · AI 智能体决策中枢');
+            autoDemoRunning = false;
+          }
+        }
+      ];
+
+      steps.forEach(s => {
+        setTimeout(s.act, s.time);
+      });
+    }
+
+    // 初始化用户状态
+    updateUserUI();
+  </script>
+</body>
+</html>

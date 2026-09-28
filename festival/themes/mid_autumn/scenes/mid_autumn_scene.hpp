@@ -21,10 +21,7 @@
 #include "../../../core/renderer/renderer.hpp"
 #include "../../../core/platform/input_event.hpp"
 
-#if __has_include("../../../addons/henan_university_114.hpp")
-#include "../../../addons/henan_university_114.hpp"
-#define FESTIVAL_HAS_HENU_114 1
-#endif
+
 
 #include <memory>
 #include <vector>
@@ -331,10 +328,7 @@ public:
         // 13. Fireworks
         m_fireworks.render(renderer);
 
-        // 14. Optional Anniversary Easter Egg (Removable Addon)
-#if defined(FESTIVAL_HAS_HENU_114)
-        festival::addons::HenanUniversityAnniversary::render(renderer);
-#endif
+
 
         // 15. Market Lighting Level Toast Notification
         if (m_marketToastTimer > 0.0f) {

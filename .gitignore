@@ -16,6 +16,7 @@ tests/*.exe
 tests/*.txt
 *.tmp
 *.log
+*.png
 
 # Build Directories
 build/
@@ -31,3 +32,9 @@ out/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Node.js & SQLite Temps
+node_modules/
+*.db-wal
+*.db-shm
+*.sqlite-journal

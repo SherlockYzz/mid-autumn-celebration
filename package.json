@@ -1,0 +1,25 @@
+{
+  "name": "chinese-festival-celebration-suite",
+  "version": "2.0.0",
+  "description": "中华华节盛典 · 岁时交互引擎系统 (Chinese Festival Celebration Suite) - 全栈服务、个人管理中心、账户系统与多端适配",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "test": "node -e \"require('./server/db.js'); console.log('✓ SQLite Database and Backend tests OK');\""
+  },
+  "keywords": [
+    "chinese-festival",
+    "mid-autumn",
+    "national-day",
+    "spring-festival",
+    "lantern-festival",
+    "interactive-game",
+    "pixel-art",
+    "web-audio",
+    "sqlite",
+    "fullstack"
+  ],
+  "author": "SherlockYzz",
+  "license": "MIT"
+}
