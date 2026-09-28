@@ -891,22 +891,236 @@
       border-color: #ba68c8;
       color: #fff;
     }
+
+    /* ===== 两仪三视口系统与星汉算筹样式 ===== */
+    .grand-viewport-dock {
+      display: flex;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      padding: 4px;
+      box-shadow: var(--glass-shadow);
+      gap: 4px;
+    }
+    .viewport-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.75);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .viewport-tab-btn:hover {
+      color: var(--gold-bright);
+      background: rgba(245, 215, 127, 0.12);
+    }
+    .viewport-tab-btn.active {
+      background: linear-gradient(135deg, rgba(245, 215, 127, 0.3), rgba(74, 20, 140, 0.5));
+      border-color: var(--gold-primary);
+      color: var(--gold-bright);
+      font-weight: bold;
+      box-shadow: 0 0 16px rgba(245, 215, 127, 0.45);
+    }
+
+    /* 智算拓扑工作台视口容器 */
+    #lambda-workstation-viewport {
+      position: absolute;
+      top: 66px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      background: #0d1117;
+      display: none;
+    }
+    #lambda-workstation-viewport.active {
+      display: block;
+    }
+    #lambda-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* 星汉算筹天象叠加画布 */
+    #celestial-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      display: none;
+    }
+    #celestial-canvas.active {
+      display: block;
+    }
+
+    /* 星汉算筹天象控制悬浮面板 */
+    #celestial-control-card {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      background: rgba(11, 21, 40, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--gold-primary);
+      border-radius: 16px;
+      padding: 14px 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(245, 215, 127, 0.3);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      width: min(760px, 94vw);
+    }
+    #celestial-control-card.active {
+      display: flex;
+    }
+    .celestial-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(245, 215, 127, 0.2);
+      padding-bottom: 8px;
+    }
+    .celestial-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--gold-bright);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .celestial-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(245, 215, 127, 0.2);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-bright);
+      font-family: monospace;
+    }
+    .celestial-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .celestial-select {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(245, 215, 127, 0.4);
+      color: var(--gold-bright);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      outline: none;
+      font-family: inherit;
+    }
+    .celestial-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(245, 215, 127, 0.3);
+      border-radius: 8px;
+      color: #fff;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 6px 12px;
+      outline: none;
+    }
+    .celestial-stepper-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .celestial-narrative {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.4;
+      flex: 1;
+      font-family: inherit;
+    }
+    .celestial-btn-group {
+      display: flex;
+      gap: 6px;
+    }
+    .celestial-btn {
+      background: rgba(245, 215, 127, 0.15);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-bright);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .celestial-btn:hover {
+      background: rgba(245, 215, 127, 0.3);
+      box-shadow: 0 0 10px rgba(245, 215, 127, 0.4);
+    }
+    .celestial-btn-solid {
+      background: linear-gradient(135deg, var(--gold-primary), var(--crimson));
+      color: #000;
+      font-weight: bold;
+      border-color: var(--gold-bright);
+    }
   </style>
+
+  <!-- John Tromp Lambda 形式化演算拓扑引擎依赖脚本 -->
+  <script src="lambda/js/ast.js"></script>
+  <script src="lambda/js/reduction.js"></script>
+  <script src="lambda/js/layout.js"></script>
+  <script src="lambda/js/presets.js"></script>
 </head>
 <body>
 
   <!-- 主交互渲染画布 -->
   <canvas id="festival-canvas"></canvas>
 
+  <!-- 星汉算筹天象演算画布 -->
+  <canvas id="celestial-canvas"></canvas>
+
+  <!-- 智算拓扑工作台独立视口容器 -->
+  <div id="lambda-workstation-viewport">
+    <iframe id="lambda-iframe" src="lambda/index.html" title="John Tromp Lambda Diagrams Workstation"></iframe>
+  </div>
+
   <!-- 顶部导航与状态栏 (HUD) -->
   <header class="top-nav">
     <div class="brand-seal-badge">
-      <div class="seal-icon">华</div>
+      <div class="seal-icon">☯</div>
       <div class="brand-title-wrap">
-        <span class="brand-main-title">中华华节盛典</span>
-        <span class="brand-sub-title">岁时交互引擎 · 全景平台</span>
+        <span class="brand-main-title">两仪天工 · 智算文心</span>
+        <span class="brand-sub-title">形式化拓扑演算与中华岁时交互系统</span>
       </div>
     </div>
+
+    <!-- 两仪三视口切换 Dock -->
+    <nav class="grand-viewport-dock" aria-label="核心视口切换">
+      <button class="viewport-tab-btn active" data-vp="festival" id="vpTabFestival" title="华彩岁时盛典">
+        <span>🏮</span> 华彩岁时
+      </button>
+      <button class="viewport-tab-btn" data-vp="lambda" id="vpTabLambda" title="John Tromp Lambda 形式化拓扑工坊">
+        <span>📐</span> 智算拓扑
+      </button>
+      <button class="viewport-tab-btn" data-vp="celestial" id="vpTabCelestial" title="星汉算筹 · 天象演算法">
+        <span>✨</span> 星汉算筹
+      </button>
+    </nav>
 
     <!-- 节日选择 Dock (桌面与平板端) -->
     <nav class="festival-dock" aria-label="节日切换">
@@ -1023,6 +1237,59 @@
   <!-- 经验晋升与里程碑飘字提示 -->
   <div class="exp-toast" id="exp-toast">
     <span>🌟</span> <span id="exp-toast-text">+30 EXP · 岁时祈福</span>
+  </div>
+
+  <!-- ==================== 星汉算筹 · 天象演算法控制器 ==================== -->
+  <div id="celestial-control-card">
+    <div class="celestial-header-row">
+      <div class="celestial-title">
+        <span>✨</span> 星汉算筹 · 天象演算法
+        <span class="celestial-badge" id="celestial-status-badge">第 0 步 · 就绪</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="celestial-btn" onclick="openAgentModal(); window.sendAgentQuick('请以计算哲学角度解释当前天象算筹与易道八卦的拓扑同构');" title="吩咐灵仙解读当前拓扑数理">
+          <span>🔮</span> 灵仙算筹注疏
+        </button>
+        <button class="celestial-btn" onclick="switchViewport('lambda')" title="切换到完整 John Tromp 工作台">
+          <span>📐</span> 深入拓扑工坊
+        </button>
+      </div>
+    </div>
+
+    <!-- 算筹预设与输入行 -->
+    <div class="celestial-input-row">
+      <select class="celestial-select" id="celestial-preset-select" onchange="CelestialEvaluator.loadPreset(this.value)">
+        <option value="add">丘奇加法 2 + 1 (Church Add)</option>
+        <option value="mul">丘奇乘法 2 * 2 (Church Mul)</option>
+        <option value="ski_s">S 组合子 (代换分配核心)</option>
+        <option value="y_comb">Y 组合子 (递归不动点)</option>
+        <option value="church_2">丘奇自然数 2 (Church Two)</option>
+        <option value="bool_and">布尔与门 (Boolean AND)</option>
+        <option value="identity">恒等映射 I (太极归一)</option>
+      </select>
+      <input type="text" class="celestial-input" id="celestial-expr-input" spellcheck="false" placeholder="输入 Lambda 表达式，例如 (\x. x) y">
+      <button class="celestial-btn celestial-btn-solid" onclick="CelestialEvaluator.loadExpression(document.getElementById('celestial-expr-input').value, '自定算筹')">
+        天象排盘
+      </button>
+    </div>
+
+    <!-- 规约演进状态与操作行 -->
+    <div class="celestial-stepper-row">
+      <div class="celestial-narrative" id="celestial-narrative">
+        已载入算筹，苍穹星象已结为形式化拓扑天幕。点击【演进一阶】观察 β-规约与金石编钟奏鸣！
+      </div>
+      <div class="celestial-btn-group">
+        <button class="celestial-btn" onclick="CelestialEvaluator.reset()" title="重置天象到初始状态">
+          <span>↺</span> 复位
+        </button>
+        <button class="celestial-btn celestial-btn-solid" onclick="CelestialEvaluator.step()" title="单步触发一次 β-规约演进">
+          <span>▶</span> 演进一阶
+        </button>
+        <button class="celestial-btn" id="btn-celestial-auto" onclick="CelestialEvaluator.autoRun()" title="全自动太极演进推演">
+          <span>⚡</span> 太极推演
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ==================== 模态框 1: 个人管理中心与庆典工坊 ==================== -->
@@ -1460,6 +1727,19 @@
         const chimes = [523.25, 659.25, 783.99, 1046.50];
         const f = chimes[Math.floor(Math.random() * chimes.length)];
         this.playTone(f, 2.0, 'sine', 0.2);
+      }
+
+      // 星汉金石编钟谐波 (两仪拓扑演算五声音阶)
+      playCelestialHarmonic(stepIndex = 0) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+        const base = scale[stepIndex % scale.length];
+        this.playTone(base, 1.4, 'sine', 0.28);
+        setTimeout(() => {
+          this.playTone(base * 1.5, 0.9, 'triangle', 0.16);
+        }, 50);
       }
 
       // 升级与胜利号角
@@ -2819,8 +3099,18 @@
 
     function executeAgentActions(actions) {
       actions.forEach(act => {
-        if (act.type === 'switch_festival') {
+        if (act.type === 'switch_viewport') {
+          switchViewport(act.payload);
+        } else if (act.type === 'switch_festival') {
           switchFestival(act.payload);
+        } else if (act.type === 'load_lambda_formula') {
+          CelestialEvaluator.loadExpression(act.payload.code, act.payload.name);
+        } else if (act.type === 'run_celestial_reduction') {
+          switchViewport('celestial');
+          CelestialEvaluator.loadExpression(act.payload.code, act.payload.name);
+          setTimeout(() => {
+            CelestialEvaluator.step();
+          }, 900);
         } else if (act.type === 'update_couplets') {
           if (act.payload.left) document.getElementById('couplet-left').textContent = act.payload.left;
           if (act.payload.right) document.getElementById('couplet-right').textContent = act.payload.right;
@@ -2833,13 +3123,44 @@
             spawnFirework();
           } else if (act.payload === 'divination') {
             triggerDivination();
+          } else if (act.payload === 'celestial_chime') {
+            sound.playCelestialHarmonic(1);
           }
         }
       });
     }
 
-    // 离线本地文化推理智能体
+    // 离线本地文化与形式化拓扑推理智能体
     function localAgentReasoning(text) {
+      const lower = text.toLowerCase();
+
+      // 形式化拓扑与天象演算
+      if (
+        lower.includes('lambda') || lower.includes('演算') || lower.includes('规约') ||
+        lower.includes('beta') || lower.includes('redex') || lower.includes('不动点') ||
+        lower.includes('y组合子') || lower.includes('ski') || lower.includes('丘奇') ||
+        lower.includes('算筹') || lower.includes('天象') || lower.includes('拓扑')
+      ) {
+        const isCelestial = lower.includes('天象') || lower.includes('星汉') || lower.includes('星空') || lower.includes('演示');
+        const targetVp = isCelestial ? 'celestial' : 'lambda';
+        const actions = [
+          { type: 'switch_viewport', payload: targetVp },
+          { type: 'load_lambda_formula', payload: { code: '(\\m. \\n. \\f. \\x. m f (n f x)) (\\f. \\x. f (f x)) (\\f. \\x. f x)', name: '丘奇加法 2 + 1' } },
+          { type: 'update_couplets', payload: { left: '二仪生象加法立', right: '万物归函法理通' } },
+          { type: 'update_banner', payload: '两仪演数 · 丘奇加法' },
+          { type: 'trigger_effect', payload: 'celestial_chime' }
+        ];
+        if (isCelestial) {
+          actions.push({ type: 'run_celestial_reduction', payload: { code: '(\\m. \\n. \\f. \\x. m f (n f x)) (\\f. \\x. f (f x)) (\\f. \\x. f x)', name: '丘奇加法 2 + 1' } });
+        }
+        return {
+          reply: `灵仙已为您开辟【${isCelestial ? '星汉算筹 · 天象演算法' : '数理拓扑工坊'}】！当前苍穹已载入丘奇加法 (2 + 1)，五音金石编钟与天幕红基火树银花交相辉映！赠联：“二仪生象加法立，万物归函法理通”！`,
+          thought: `【本地推理】识别形式化计算意图，调度视口【${targetVp}】，加载丘奇加法，联动天象与编钟。`,
+          actions,
+          festival: currentFestival
+        };
+      }
+
       let festival = currentFestival;
       if (text.includes('国庆') || text.includes('祖国') || text.includes('山河') || text.includes('礼炮')) festival = 'national_day';
       else if (text.includes('新春') || text.includes('除夕') || text.includes('发财') || text.includes('狮')) festival = 'spring_festival';
@@ -2870,7 +3191,304 @@
     }
 
     // ==========================================
-    // 13. 自动演示模式 (Auto-Demo Mode - 竞赛录屏专用)
+    // 13. 两仪三视口切换与同步管理器
+    // ==========================================
+    let currentViewport = 'festival'; // 'festival' | 'lambda' | 'celestial'
+
+    function switchViewport(vp) {
+      currentViewport = vp;
+
+      document.querySelectorAll('.viewport-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-vp') === vp);
+      });
+
+      const festCanvas = document.getElementById('festival-canvas');
+      const festDock = document.querySelector('.festival-dock');
+      const banner = document.getElementById('project-banner');
+      const leftCouplet = document.getElementById('couplet-left');
+      const rightCouplet = document.getElementById('couplet-right');
+      const bottomBar = document.querySelector('.bottom-bar');
+      const lambdaVp = document.getElementById('lambda-workstation-viewport');
+      const celestialCanvas = document.getElementById('celestial-canvas');
+      const celestialCard = document.getElementById('celestial-control-card');
+
+      if (vp === 'festival') {
+        festCanvas.style.display = 'block';
+        if (festDock) festDock.style.display = 'flex';
+        if (banner) banner.style.display = 'block';
+        if (leftCouplet) leftCouplet.style.display = 'block';
+        if (rightCouplet) rightCouplet.style.display = 'block';
+        if (bottomBar) bottomBar.style.display = 'flex';
+        if (lambdaVp) lambdaVp.classList.remove('active');
+        if (celestialCanvas) celestialCanvas.classList.remove('active');
+        if (celestialCard) celestialCard.classList.remove('active');
+        CelestialEvaluator.active = false;
+        showExpToast('🏮 已切换至【华彩岁时盛典】视口');
+      } else if (vp === 'lambda') {
+        if (lambdaVp) lambdaVp.classList.add('active');
+        if (festDock) festDock.style.display = 'none';
+        if (banner) banner.style.display = 'none';
+        if (leftCouplet) leftCouplet.style.display = 'none';
+        if (rightCouplet) rightCouplet.style.display = 'none';
+        if (bottomBar) bottomBar.style.display = 'none';
+        if (celestialCanvas) celestialCanvas.classList.remove('active');
+        if (celestialCard) celestialCard.classList.remove('active');
+        CelestialEvaluator.active = false;
+        syncTokenToLambdaIframe();
+        showExpToast('📐 已切换至【John Tromp 形式化拓扑工坊】视口');
+      } else if (vp === 'celestial') {
+        festCanvas.style.display = 'block';
+        if (festDock) festDock.style.display = 'none';
+        if (banner) banner.style.display = 'block';
+        if (leftCouplet) leftCouplet.style.display = 'block';
+        if (rightCouplet) rightCouplet.style.display = 'block';
+        if (bottomBar) bottomBar.style.display = 'none';
+        if (lambdaVp) lambdaVp.classList.remove('active');
+        if (celestialCanvas) celestialCanvas.classList.add('active');
+        if (celestialCard) celestialCard.classList.add('active');
+        CelestialEvaluator.active = true;
+        CelestialEvaluator.resize();
+        CelestialEvaluator.render();
+        showExpToast('✨ 已切换至【星汉算筹 · 天象演算法】视口');
+      }
+    }
+
+    function syncTokenToLambdaIframe() {
+      const iframe = document.getElementById('lambda-iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          if (dataMgr.token) {
+            iframe.contentWindow.localStorage.setItem('lambda_diagram_token', dataMgr.token);
+          }
+        } catch(e){}
+      }
+    }
+
+    // ==========================================
+    // 14. 星汉算筹 · 天象演算法引擎 (Celestial Evaluator)
+    // ==========================================
+    const CelestialEvaluator = {
+      active: false,
+      canvas: null,
+      ctx: null,
+      currentTerm: null,
+      initialTerm: null,
+      currentLayout: null,
+      stepCount: 0,
+      autoTimer: null,
+      activeRedex: null,
+
+      init() {
+        this.canvas = document.getElementById('celestial-canvas');
+        if (!this.canvas) return;
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.loadPreset('add');
+      },
+
+      resize() {
+        if (!this.canvas) return;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        if (this.active) this.render();
+      },
+
+      loadPreset(key) {
+        const presets = {
+          add: { name: '丘奇加法 2 + 1', code: '(\\m. \\n. \\f. \\x. m f (n f x)) (\\f. \\x. f (f x)) (\\f. \\x. f x)' },
+          mul: { name: '丘奇乘法 2 * 2', code: '(\\m. \\n. \\f. m (n f)) (\\f. \\x. f (f x)) (\\f. \\x. f (f x))' },
+          ski_s: { name: 'S 组合子 (代换分配核心)', code: '\\x. \\y. \\z. x z (y z)' },
+          y_comb: { name: 'Y 组合子 (递归不动点)', code: '\\f. (\\x. f (x x)) (\\x. f (x x))' },
+          church_2: { name: '丘奇数 2', code: '\\f. \\x. f (f x)' },
+          bool_and: { name: '布尔与门 (Boolean AND)', code: '\\p. \\q. p q p' },
+          identity: { name: '恒等映射 I (太极归一)', code: '\\x. x' }
+        };
+        const p = presets[key] || presets.add;
+        document.getElementById('celestial-preset-select').value = key;
+        this.loadExpression(p.code, p.name);
+      },
+
+      loadExpression(code, name = '') {
+        try {
+          const ast = parseNamedLambda(code);
+          const db = convertNamedToDB(ast);
+          this.initialTerm = db;
+          this.currentTerm = db;
+          this.stepCount = 0;
+          this.activeRedex = null;
+          document.getElementById('celestial-expr-input').value = code;
+          document.getElementById('celestial-status-badge').textContent = `第 0 步 · 就绪`;
+          document.getElementById('celestial-narrative').textContent = `已载入算筹【${name || '自定项'}】，苍穹星象已结为形式化拓扑天幕。`;
+          this.updateLayout();
+          this.render();
+        } catch (e) {
+          document.getElementById('celestial-narrative').textContent = `解析异常: ${e.message}`;
+        }
+      },
+
+      updateLayout() {
+        if (!this.currentTerm) return;
+        this.currentLayout = computeTrompLayout(this.currentTerm);
+      },
+
+      step() {
+        if (!this.currentTerm) return false;
+        const stepMeta = prepareReductionStep(this.currentTerm, 'normal');
+        if (!stepMeta || !stepMeta.redexNodeIds || stepMeta.redexNodeIds.length === 0) {
+          document.getElementById('celestial-status-badge').textContent = `✅ 典范范式 (Normal Form)`;
+          document.getElementById('celestial-narrative').textContent = `太极归元，当前项已完全化简，无可规约红基 (Redex)！`;
+          sound.playCelestialHarmonic(this.stepCount + 1);
+          triggerGrandCelebration();
+          showExpToast('🌟 拓扑演化大成！已达典范范式！');
+          return false;
+        }
+
+        this.stepCount++;
+        this.activeRedex = stepMeta.redexId;
+        this.currentTerm = stepMeta.termAfter;
+
+        // 播放五声音阶谐波编钟
+        sound.playCelestialHarmonic(this.stepCount);
+
+        // 触发天幕烟花
+        const burstX = window.innerWidth * (0.35 + Math.random() * 0.3);
+        const burstY = window.innerHeight * (0.2 + Math.random() * 0.25);
+        spawnFirework(burstX, burstY);
+
+        document.getElementById('celestial-status-badge').textContent = `第 ${this.stepCount} 步`;
+        document.getElementById('celestial-narrative').textContent = `β-规约推进：消解横梁 λ${stepMeta.paramName}，变量导线接入实参 [${stepMeta.argSummary}]，五音金石共鸣！`;
+
+        this.updateLayout();
+        this.render();
+        addHeat(25);
+        return true;
+      },
+
+      autoRun() {
+        if (this.autoTimer) {
+          clearInterval(this.autoTimer);
+          this.autoTimer = null;
+          document.getElementById('btn-celestial-auto').textContent = '⚡ 太极推演';
+          return;
+        }
+        document.getElementById('btn-celestial-auto').textContent = '⏸ 暂停演化';
+        this.autoTimer = setInterval(() => {
+          const cont = this.step();
+          if (!cont) {
+            clearInterval(this.autoTimer);
+            this.autoTimer = null;
+            document.getElementById('btn-celestial-auto').textContent = '⚡ 太极推演';
+          }
+        }, 1100);
+      },
+
+      reset() {
+        if (this.autoTimer) {
+          clearInterval(this.autoTimer);
+          this.autoTimer = null;
+          document.getElementById('btn-celestial-auto').textContent = '⚡ 太极推演';
+        }
+        this.currentTerm = this.initialTerm;
+        this.stepCount = 0;
+        this.activeRedex = null;
+        document.getElementById('celestial-status-badge').textContent = `第 0 步 · 重置`;
+        document.getElementById('celestial-narrative').textContent = `天象已复位至初始算筹。`;
+        this.updateLayout();
+        this.render();
+      },
+
+      render() {
+        if (!this.ctx || !this.canvas) return;
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        if (!this.currentLayout || !this.currentLayout.elements) return;
+
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const elements = this.currentLayout.elements;
+        const breadth = Math.max(6, this.currentLayout.breadth || 6);
+        const depth = Math.max(5, this.currentLayout.depth || 5);
+
+        const marginX = w * 0.18;
+        const startY = 140;
+        const usableW = w * 0.64;
+        const colStep = usableW / (breadth + 1);
+        const rowStep = Math.min(50, (h * 0.42) / (depth + 1));
+
+        // 绘制天象星宿背景光晕
+        const glowGrad = ctx.createRadialGradient(w / 2, startY + (depth * rowStep) / 2, 40, w / 2, startY + (depth * rowStep) / 2, usableW / 1.4);
+        glowGrad.addColorStop(0, 'rgba(245, 215, 127, 0.12)');
+        glowGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = glowGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // 绘制 Tromp 拓扑线元
+        elements.forEach(el => {
+          const isRedex = this.activeRedex === el.nodeId || this.activeRedex === el.id;
+
+          if (el.type === 'lambda') {
+            const x1 = marginX + el.x1 * colStep;
+            const x2 = marginX + el.x2 * colStep;
+            const y = startY + el.y * rowStep;
+
+            ctx.save();
+            ctx.strokeStyle = isRedex ? '#ffffff' : '#ffd700';
+            ctx.lineWidth = isRedex ? 6 : 3.5;
+            ctx.shadowColor = isRedex ? '#00e5ff' : '#ffe082';
+            ctx.shadowBlur = isRedex ? 24 : 12;
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y);
+            ctx.lineTo(x2, y);
+            ctx.stroke();
+
+            // 梁端星宿金核
+            ctx.fillStyle = isRedex ? '#ffffff' : '#ffe082';
+            ctx.beginPath();
+            ctx.arc(x1, y, isRedex ? 6 : 4, 0, Math.PI * 2);
+            ctx.arc(x2, y, isRedex ? 6 : 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 标注参数
+            ctx.fillStyle = '#ffecb3';
+            ctx.font = 'bold 12px monospace';
+            ctx.fillText(`λ${el.name}`, x1 - 18, y - 6);
+            ctx.restore();
+          } else if (el.type === 'variable') {
+            const x = marginX + el.x1 * colStep;
+            const y1 = startY + el.y1 * rowStep;
+            const y2 = startY + el.y2 * rowStep;
+
+            ctx.save();
+            ctx.strokeStyle = el.isFree ? '#ff8a80' : '#4dd0e1';
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = el.isFree ? '#ff5252' : '#00e5ff';
+            ctx.shadowBlur = 8;
+
+            ctx.beginPath();
+            ctx.moveTo(x, y1);
+            ctx.lineTo(x, y2);
+            ctx.stroke();
+
+            // 变量节点底座星芒
+            ctx.fillStyle = el.isFree ? '#ff8a80' : '#80deea';
+            ctx.beginPath();
+            ctx.arc(x, y2, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#e0f7fa';
+            ctx.font = '11px monospace';
+            ctx.fillText(el.name, x - 6, y2 + 16);
+            ctx.restore();
+          }
+        });
+      }
+    };
+
+    // ==========================================
+    // 15. 自动演示模式 (Auto-Demo Mode - 竞赛录屏专用)
     // ==========================================
     let autoDemoRunning = false;
     document.getElementById('btn-start-autodemo').addEventListener('click', startAutoDemo);
@@ -2923,6 +3541,19 @@
             projectMgrModal.close();
             openAgentModal();
             showExpToast('【第六幕】岁时司律灵仙 · AI 智能体决策中枢');
+          }
+        },
+        { time: 60000, act: () => {
+            agentModal.close();
+            switchViewport('celestial');
+            showExpToast('【第七幕】星汉算筹 · 天象演算法 (丘奇加法 2 + 1 拓扑推演)');
+            CelestialEvaluator.loadPreset('add');
+            setTimeout(() => CelestialEvaluator.step(), 1500);
+          }
+        },
+        { time: 70000, act: () => {
+            switchViewport('lambda');
+            showExpToast('【第八幕】John Tromp 形式化拓扑工作台 (纯黑白极简电路)');
             autoDemoRunning = false;
           }
         }
@@ -2932,6 +3563,16 @@
         setTimeout(s.act, s.time);
       });
     }
+
+    // 初始化视口切换与星汉算筹引擎
+    document.querySelectorAll('.viewport-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const vp = btn.getAttribute('data-vp');
+        switchViewport(vp);
+      });
+    });
+
+    CelestialEvaluator.init();
 
     // 初始化用户状态
     updateUserUI();

@@ -39,6 +39,20 @@ function initDatabase() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS repos (
+      id TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      code TEXT NOT NULL,
+      mode TEXT DEFAULT 'classic',
+      description TEXT,
+      tags TEXT,
+      is_public INTEGER DEFAULT 1,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
@@ -206,6 +220,23 @@ function seedInitialData() {
     insertWish.run(1, 'Sherlock', '月下漫步者', '玉兔', 'mid_autumn', '愿远方家人平安健康，岁岁有今日，年年有明月。', '全家亲朋', 56, 1, now);
     insertWish.run(1, 'Sherlock', '春临九州', '瑞狮', 'spring_festival', '愿新的一年事业顺利，所得皆所愿，万事顺意！', '全体开发者', 72, 1, now);
     insertWish.run(1, 'Sherlock', '临水照花人', '金鲤', 'lantern_festival', '愿灯火长明，喜乐常伴，千里共团圆。', '挚友知音', 43, 1, now);
+  }
+
+  // 检查是否初始化 Lambda 形式化拓扑算筹预设
+  const checkRepo = db.prepare('SELECT count(*) as count FROM repos').get();
+  if (checkRepo.count === 0) {
+    const now = new Date().toISOString();
+    const insertRepo = db.prepare(`
+      INSERT INTO repos (id, user_id, title, code, mode, description, tags, is_public, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    insertRepo.run('repo_church_two', 1, '丘奇自然数 2 (Church Two)', '\\f. \\x. f (f x)', 'classic', '高阶函数两次复合，形式化算术的基石', JSON.stringify(['church', 'arithmetic', 'classic']), 1, now, now);
+    insertRepo.run('repo_ski_s', 1, 'S 组合子 (Substitution)', '\\x. \\y. \\z. x z (y z)', 'classic', 'S-K-I 完备组合子系统之代换分配核', JSON.stringify(['combinator', 'ski', 'foundational']), 1, now, now);
+    insertRepo.run('repo_ski_k', 1, 'K 组合子 (Constant)', '\\x. \\y. x', 'classic', '常数发生器，丢弃次要参数', JSON.stringify(['combinator', 'ski']), 1, now, now);
+    insertRepo.run('repo_ski_i', 1, 'I 组合子 (Identity)', '\\x. x', 'classic', '恒等变换，太极归一', JSON.stringify(['combinator', 'ski', 'identity']), 1, now, now);
+    insertRepo.run('repo_add_two_one', 1, '丘奇加法 2 + 1', '(\\m. \\n. \\f. \\x. m f (n f x)) (\\f. \\x. f (f x)) (\\f. \\x. f x)', 'classic', '两仪生三象，二项式加法逐步规约演化', JSON.stringify(['church', 'addition', 'reduction']), 1, now, now);
+    insertRepo.run('repo_y_combinator', 1, 'Y 组合子 (不动点算子 Fixpoint)', '\\f. (\\x. f (x x)) (\\x. f (x x))', 'classic', '无递归语法实现通用递归计算，计算机科学最深邃的奇迹', JSON.stringify(['fixpoint', 'recursion', 'advanced']), 1, now, now);
   }
 
   // 初始化全局热度

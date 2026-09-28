@@ -1,0 +1,195 @@
+/**
+ * John Tromp Lambda Diagrams Workstation - Diagram Styles
+ * Circuit-style geometric visualization, 5-phase visual system, and animations
+ */
+
+.svg-canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+}
+
+.svg-canvas-container:active {
+  cursor: grabbing;
+}
+
+svg.main-diagram-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Monospace Card View */
+.mono-view-container {
+  display: none;
+  flex: 1;
+  padding: 24px;
+  overflow: auto;
+  background: var(--canvas-bg);
+}
+
+.mono-card {
+  font-family: var(--font-code);
+  font-size: 14px;
+  line-height: 1.25;
+  color: var(--text);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 20px;
+  display: inline-block;
+  min-width: 320px;
+  user-select: text;
+}
+
+/* SVG Diagram Geometries - Minimalist Black & White */
+.diag-abs {
+  stroke-width: 5px;
+  stroke-linecap: square;
+  stroke: var(--text);
+  transition: opacity 0.2s, stroke-width 0.2s;
+}
+
+.diag-var {
+  stroke-width: 4px;
+  stroke-linecap: square;
+  stroke: var(--text);
+  transition: opacity 0.2s, stroke-width 0.2s;
+}
+
+.diag-app {
+  stroke-width: 4px;
+  stroke-linecap: square;
+  stroke: var(--text);
+  transition: opacity 0.2s, stroke-width 0.2s;
+}
+
+/* Redex highlight in monochrome: distinctive outline or inverted beacon */
+.diag-redex-bridge {
+  stroke-width: 6px !important;
+  stroke: var(--text) !important;
+  stroke-dasharray: 6 3;
+  cursor: pointer;
+  animation: dash-pulse 1s linear infinite;
+}
+
+@keyframes dash-pulse {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+.diag-target-var {
+  stroke-width: 5.5px !important;
+  stroke-dasharray: 5 2.5;
+}
+
+.diag-dissolving {
+  opacity: 0.25 !important;
+  stroke-dasharray: 3 4 !important;
+}
+
+.diag-dimmed {
+  opacity: 0.4 !important;
+}
+
+.diag-highlighted {
+  stroke-width: 6px !important;
+}
+
+.diag-dot {
+  fill: var(--text);
+}
+
+.diag-label {
+  font-family: var(--font-code);
+  font-size: 11px;
+  font-weight: 500;
+  fill: var(--text-dim);
+  user-select: none;
+}
+
+.receptor-socket {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.5px;
+  stroke-dasharray: 3 2;
+}
+
+/* 5-Phase Distinct Visual System */
+.phase-spotlight-frame {
+  fill: var(--bg-subpanel);
+  fill-opacity: 0.15;
+  stroke: var(--text);
+  stroke-width: 1.5px;
+  stroke-dasharray: 5 3;
+  rx: 4px;
+  animation: frame-pulse 2s ease-in-out infinite;
+}
+
+@keyframes frame-pulse {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.phase-arg-box {
+  fill: var(--bg-subpanel);
+  fill-opacity: 0.3;
+  stroke: var(--text);
+  stroke-width: 1.5px;
+  stroke-dasharray: 5 3;
+  rx: 4px;
+}
+
+.phase-flow-trace {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2px;
+  stroke-dasharray: 4 3;
+  animation: dash-pulse 1s linear infinite;
+}
+
+.phase-socket-outer {
+  fill: var(--bg-base);
+  stroke: var(--text);
+  stroke-width: 2px;
+}
+
+.phase-socket-inner {
+  fill: var(--text);
+}
+
+.phase-docked-block {
+  fill: var(--bg-subpanel);
+  stroke: var(--text);
+  stroke-width: 1.5px;
+  rx: 3px;
+}
+
+/* Interactive Hover Tooltip */
+.interactive-tooltip {
+  position: absolute;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  pointer-events: none;
+  z-index: 100;
+  display: none;
+  max-width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.interactive-tooltip .t-head {
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}

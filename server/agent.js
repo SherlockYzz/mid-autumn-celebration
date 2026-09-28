@@ -97,6 +97,79 @@ function analyzeAndPlanLocally(text, context) {
 
   const templates = CULTURAL_TEMPLATES[targetFestival];
 
+  // 意图分析：形式化拓扑演算 (Lambda Calculus) 与星汉算筹天象演算法
+  if (
+    lower.includes('lambda') || lower.includes('演算') || lower.includes('规约') ||
+    lower.includes('beta') || lower.includes('redex') || lower.includes('不动点') ||
+    lower.includes('y组合子') || lower.includes('y combinator') || lower.includes('ski') ||
+    lower.includes('church') || lower.includes('丘奇') || lower.includes('算筹') ||
+    lower.includes('天象') || lower.includes('拓扑') || lower.includes('debruijn') ||
+    lower.includes('德布鲁因') || lower.includes('星汉') || lower.includes('组合子') ||
+    text.includes('\\') || text.includes('λ')
+  ) {
+    const isCelestial = text.includes('天象') || text.includes('星汉') || text.includes('星空') || text.includes('演示') || text.includes('演化') || text.includes('推演');
+    const targetVp = isCelestial ? 'celestial' : 'lambda';
+
+    actions.push({ type: 'switch_viewport', payload: targetVp });
+
+    let termCode = '\\f. \\x. f (f x)';
+    let termName = '丘奇数 2 (Church Two)';
+    let mathCouplet = { left: '函子双重涵造化', right: '参变量度见乾坤', banner: '两仪演数' };
+
+    if (text.includes('加') || text.includes('add') || text.includes('+') || text.includes('2+1') || text.includes('1+1')) {
+      termCode = '(\\m. \\n. \\f. \\x. m f (n f x)) (\\f. \\x. f (f x)) (\\f. \\x. f x)';
+      termName = '丘奇加法 (2 + 1)';
+      mathCouplet = { left: '二仪生象加法立', right: '万物归函法理通', banner: '合数天成' };
+    } else if (text.includes('乘') || text.includes('mul') || text.includes('*')) {
+      termCode = '(\\m. \\n. \\f. m (n f)) (\\f. \\x. f (f x)) (\\f. \\x. f (f x))';
+      termName = '丘奇乘法 (2 * 2)';
+      mathCouplet = { left: '双重复合穷玄理', right: '四象流转入微茫', banner: '算筹入妙' };
+    } else if (text.includes('y') || text.includes('不动点') || text.includes('递归') || text.includes('fixpoint')) {
+      termCode = '\\f. (\\x. f (x x)) (\\x. f (x x))';
+      termName = 'Y 组合子 (不动点算子)';
+      mathCouplet = { left: '无名函数成千劫', right: '不动灵枢立太虚', banner: '玄妙自指' };
+    } else if (text.includes('ski') || text.includes('替换') || text.includes('s组合')) {
+      termCode = '\\x. \\y. \\z. x z (y z)';
+      termName = 'S 组合子 (代换分配核)';
+      mathCouplet = { left: '虚静生机分万类', right: '代换分配理千端', banner: '三元化育' };
+    } else if (text.includes('恒等') || text.includes('identity') || text.includes('i组合')) {
+      termCode = '\\x. x';
+      termName = 'I 组合子 (太极归一)';
+      mathCouplet = { left: '太极元初同一质', right: '虚舟不系自天成', banner: '太极归一' };
+    }
+
+    actions.push({
+      type: 'load_lambda_formula',
+      payload: { code: termCode, name: termName }
+    });
+
+    if (isCelestial) {
+      actions.push({
+        type: 'run_celestial_reduction',
+        payload: { code: termCode, name: termName }
+      });
+      actions.push({ type: 'trigger_effect', payload: 'celestial_chime' });
+    }
+
+    actions.push({
+      type: 'update_couplets',
+      payload: { left: mathCouplet.left, right: mathCouplet.right }
+    });
+    actions.push({
+      type: 'update_banner',
+      payload: mathCouplet.banner
+    });
+
+    thought = `【意图识别】形式化拓扑计算与计算哲学意图；【技术决策】激活${isCelestial ? '【星汉算筹 · 天象演算法】' : '【数理拓扑工坊】'}视口，加载经典项【${termName}】，将 Tromp 抽象梁与变量导线映射为天象星官算筹；【跨域协同】同步奏响五音编钟，并在天穹触发拓扑规约烟火！`;
+    reply = `灵仙已通阴阳数理！已为您调取【${termName}】（\`${termCode}\`），并切入${isCelestial ? '【星汉算筹 · 天象演算法】全景星宿天幕' : '【数理拓扑工坊】'}！在苍穹星光之中，抽象横梁如玉宇飞檐，变量回环似周天星斗，每一次 β-规约均将伴随五音金石编钟奏响天籁！特题对联：上联“${mathCouplet.left}”，下联“${mathCouplet.right}”，横批【${mathCouplet.banner}】！`;
+    return {
+      reply,
+      thought,
+      actions,
+      festival: targetFestival
+    };
+  }
+
   // 意图分析：定制对联与春联
   if (text.includes('联') || text.includes('对子') || text.includes('写') || text.includes('题')) {
     // 匹配最适合的对联风格

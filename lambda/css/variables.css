@@ -1,0 +1,98 @@
+/**
+ * John Tromp Lambda Diagrams Workstation - Variables & Base Styles
+ * Pure Monochrome Bauhaus Design System & Long-Cylinder Scrollbar
+ */
+
+:root {
+  --bg-base: #000000;
+  --bg-panel: #0a0a0a;
+  --bg-subpanel: #141414;
+  --bg-input: #050505;
+  --border: #262626;
+  --border-light: #404040;
+  --text: #ffffff;
+  --text-muted: #a3a3a3;
+  --text-dim: #737373;
+  --accent: #ffffff;
+  --accent-inv: #000000;
+  --redex-border: #ffffff;
+  --canvas-bg: #000000;
+  --grid-dot: #1a1a1a;
+  --font-code: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, Monaco, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg-base: #f5f5f5;
+  --bg-panel: #ffffff;
+  --bg-subpanel: #eaeaea;
+  --bg-input: #ffffff;
+  --border: #d4d4d4;
+  --border-light: #a3a3a3;
+  --text: #0a0a0a;
+  --text-muted: #525252;
+  --text-dim: #8c8c8c;
+  --accent: #000000;
+  --accent-inv: #ffffff;
+  --redex-border: #000000;
+  --canvas-bg: #ffffff;
+  --grid-dot: #e5e5e5;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Fallback for non-webkit browsers (e.g. Firefox) without triggering Chromium Windows buttons */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-light) transparent;
+  }
+}
+
+/* Custom Long-Cylinder Scrollbar (Strictly No Up/Down/Left/Right Buttons) */
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-button:single-button,
+::-webkit-scrollbar-button:vertical:decrement,
+::-webkit-scrollbar-button:vertical:increment,
+::-webkit-scrollbar-button:horizontal:decrement,
+::-webkit-scrollbar-button:horizontal:increment,
+::-webkit-scrollbar-button:start,
+::-webkit-scrollbar-button:end {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-track-piece {
+  background: transparent !important;
+  border: none !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-light) !important;
+  border-radius: 9999px !important;
+  border: none !important;
+  min-height: 40px !important;
+  background-clip: padding-box;
+  transition: background-color 0.15s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted) !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent !important;
+}

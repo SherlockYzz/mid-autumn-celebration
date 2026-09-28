@@ -1,12 +1,13 @@
 {
-  "name": "chinese-festival-celebration-suite",
-  "version": "2.0.0",
-  "description": "中华华节盛典 · 岁时交互引擎系统 (Chinese Festival Celebration Suite) - 全栈服务、个人管理中心、账户系统与多端适配",
+  "name": "computational-tao-celebration",
+  "version": "3.0.0",
+  "description": "两仪天工 · 智算文心：基于多模态 AI Agent 的形式化拓扑演算与中华岁时交互全栈数字系统 (Computational Tao)",
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
     "dev": "node --watch server/server.js",
-    "test": "node -e \"require('./server/db.js'); console.log('✓ SQLite Database and Backend tests OK');\""
+    "test": "node tests/test_unified_server.js",
+    "pdf": "node scripts/generate_pdf.js"
   },
   "keywords": [
     "chinese-festival",

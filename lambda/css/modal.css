@@ -1,0 +1,476 @@
+/**
+ * John Tromp Lambda Diagrams Workstation - Modal Styles
+ * Modals for Presets, Authentication, Formula Repository, and Guides
+ */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  width: 680px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.modal-box-lg {
+  width: 880px;
+  max-width: 94vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-top h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.close-modal-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.close-modal-btn:hover {
+  color: var(--text);
+}
+
+.modal-inner {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.modal-inner h3 {
+  font-size: 14px;
+  margin: 14px 0 6px;
+  color: var(--text);
+}
+
+.modal-inner p {
+  margin-bottom: 10px;
+}
+
+.modal-inner ul {
+  margin-left: 18px;
+  margin-bottom: 10px;
+}
+
+.modal-inner code {
+  font-family: var(--font-code);
+  background: var(--bg-subpanel);
+  border: 1px solid var(--border);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.modal-footer-note {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* =========================================================================
+ * PRESETS TABLE STYLES
+ * ========================================================================= */
+.preset-filter-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.preset-search-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  padding: 7px 12px;
+  font-size: 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+
+.preset-search-input:focus {
+  border-color: var(--border-light);
+}
+
+.preset-category-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.preset-cat-tab {
+  background: var(--bg-subpanel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.preset-cat-tab:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.preset-cat-tab.active {
+  background: var(--text);
+  color: var(--accent-inv);
+  border-color: var(--text);
+  font-weight: 600;
+}
+
+.presets-table-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-base);
+  max-height: 52vh;
+}
+
+.presets-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.presets-table th {
+  background: var(--bg-panel);
+  color: var(--text-dim);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.preset-row {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.preset-row:hover {
+  background: var(--bg-subpanel);
+}
+
+.preset-row:last-child {
+  border-bottom: none;
+}
+
+.preset-row td {
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+
+.preset-cell-name {
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--font-code);
+  white-space: nowrap;
+}
+
+.preset-cell-code {
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.preset-cell-code code {
+  background: var(--bg-subpanel);
+  border: 1px solid var(--border);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.preset-cell-cat {
+  color: var(--text-dim);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.preset-cell-desc {
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* =========================================================================
+ * AUTH & USER MODAL STYLES
+ * ========================================================================= */
+.auth-box {
+  width: 420px;
+  max-width: 92vw;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px;
+  margin-bottom: 16px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 6px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 3px;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.auth-tab.active {
+  background: var(--bg-subpanel);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.form-input:focus {
+  border-color: var(--border-light);
+}
+
+.auth-message {
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+.auth-message.error {
+  display: block;
+  background: var(--bg-subpanel);
+  border: 1px solid var(--border-light);
+  color: var(--text);
+}
+
+.auth-message.success {
+  display: block;
+  background: var(--bg-subpanel);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.profile-card {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-base);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: var(--text-muted);
+}
+
+.profile-row:last-child {
+  margin-bottom: 0;
+}
+
+.profile-value {
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--font-code);
+}
+
+/* =========================================================================
+ * EXPRESSION REPOSITORY MODAL STYLES
+ * ========================================================================= */
+.repo-modal-box {
+  width: 920px;
+  max-width: 96vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.repo-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.repo-search-box {
+  flex: 1;
+  min-width: 220px;
+}
+
+.repo-card-grid {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  padding: 2px;
+  max-height: 52vh;
+}
+
+.repo-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.repo-card:hover {
+  border-color: var(--border-light);
+  background: var(--bg-subpanel);
+}
+
+.repo-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.repo-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.repo-card-code {
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  border-radius: 3px;
+  word-break: break-all;
+  margin: 6px 0;
+  max-height: 55px;
+  overflow: hidden;
+}
+
+.repo-card-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.repo-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.tag-pill {
+  font-size: 9px;
+  background: var(--bg-subpanel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.repo-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+.repo-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-dim);
+  font-size: 13px;
+}

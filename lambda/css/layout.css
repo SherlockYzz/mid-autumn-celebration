@@ -1,0 +1,156 @@
+/**
+ * John Tromp Lambda Diagrams Workstation - Layout Styles
+ * Workspace grid, header, sidebar panel, and canvas viewport
+ */
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-sans);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+header {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-subpanel);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-code);
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--text);
+}
+
+.brand-titles h1 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-tag {
+  font-size: 10px;
+  background: var(--bg-subpanel);
+  color: var(--text-muted);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.brand-titles p {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Workspace Layout */
+.workspace-layout {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 51px);
+  overflow: hidden;
+}
+
+/* Sidebar Panel */
+.sidebar-panel {
+  width: 440px;
+  min-width: 360px;
+  max-width: 520px;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-card {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header-row {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Canvas Viewport */
+.canvas-viewport-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-top-bar {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .workspace-layout {
+    flex-direction: column;
+  }
+  .sidebar-panel {
+    width: 100%;
+    max-width: none;
+    height: 48vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .canvas-viewport-wrap {
+    height: 52vh;
+  }
+}

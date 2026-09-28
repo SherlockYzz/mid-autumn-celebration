@@ -6,6 +6,7 @@ const url = require('node:url');
 
 const auth = require('./auth.js');
 const controllers = require('./controllers.js');
+const repoController = require('./repo_controller.js');
 const agent = require('./agent.js');
 
 const PORT = process.env.PORT || 3000;
@@ -132,7 +133,8 @@ const server = http.createServer(async (req, res) => {
       if (pathname === '/api/auth/me' && req.method === 'GET') {
         const user = getAuthUser(req);
         if (!user) return sendJson(res, 401, { error: '未授权或登录已过期' });
-        return sendJson(res, 200, { success: true, user });
+        const repoCount = repoController.countUserRepos(user.id);
+        return sendJson(res, 200, { success: true, user: { ...user, repoCount } });
       }
 
       if (pathname === '/api/auth/profile' && req.method === 'PUT') {
@@ -141,6 +143,98 @@ const server = http.createServer(async (req, res) => {
         const body = await parseJsonBody(req);
         const updated = auth.updateProfile(user.id, body);
         return sendJson(res, 200, { success: true, user: updated });
+      }
+
+      // 1.5. John Tromp Lambda 形式化拓扑算筹仓库模块
+      if (pathname === '/api/repo/public' && req.method === 'GET') {
+        const search = searchParams.get('search') || '';
+        const tag = searchParams.get('tag') || '';
+        const items = repoController.getPublicRepos({ search, tag });
+        return sendJson(res, 200, { success: true, items });
+      }
+
+      if (pathname === '/api/repo' && req.method === 'GET') {
+        const user = getAuthUser(req);
+        if (!user) return sendJson(res, 401, { success: false, error: 'Unauthorized' });
+        const search = searchParams.get('search') || '';
+        const tag = searchParams.get('tag') || '';
+        const mode = searchParams.get('mode') || 'all';
+        const items = repoController.getUserRepos(user.id, { search, tag, mode });
+        return sendJson(res, 200, { success: true, items });
+      }
+
+      if (pathname === '/api/repo' && req.method === 'POST') {
+        const user = getAuthUser(req);
+        if (!user) return sendJson(res, 401, { success: false, error: 'Unauthorized' });
+        const body = await parseJsonBody(req);
+        const { title, code, mode, desc, tags, isPublic } = body;
+        if (!code || typeof code !== 'string' || !code.trim()) {
+          return sendJson(res, 400, { success: false, error: 'Expression code is required' });
+        }
+        const item = repoController.createRepo({
+          userId: user.id,
+          title: title || '未命名算筹',
+          code,
+          mode,
+          desc,
+          tags,
+          isPublic: isPublic !== false
+        });
+        return sendJson(res, 201, { success: true, item });
+      }
+
+      if (pathname.startsWith('/api/repo/')) {
+        const repoId = pathname.substring('/api/repo/'.length);
+
+        if (repoId === 'import' && req.method === 'POST') {
+          const user = getAuthUser(req);
+          if (!user) return sendJson(res, 401, { success: false, error: 'Unauthorized' });
+          const body = await parseJsonBody(req);
+          const items = Array.isArray(body) ? body : (body.items || []);
+          const imported = repoController.importRepos(user.id, items);
+          return sendJson(res, 200, { success: true, count: imported.length, items: imported });
+        }
+
+        if (repoId === 'export' && req.method === 'GET') {
+          const user = getAuthUser(req);
+          if (!user) return sendJson(res, 401, { success: false, error: 'Unauthorized' });
+          const items = repoController.getUserRepos(user.id);
+          res.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Content-Disposition': `attachment; filename="lambda_repo_${user.username}_${Date.now()}.json"`
+          });
+          res.end(JSON.stringify(items, null, 2));
+          return;
+        }
+
+        if (req.method === 'GET') {
+          const item = repoController.getRepoById(repoId);
+          if (!item) return sendJson(res, 404, { success: false, error: 'Formula not found' });
+          if (!item.isPublic) {
+            const user = getAuthUser(req);
+            if (!user || user.id !== item.userId) {
+              return sendJson(res, 403, { success: false, error: 'Access denied' });
+            }
+          }
+          return sendJson(res, 200, { success: true, item });
+        }
+
+        if (req.method === 'PUT') {
+          const user = getAuthUser(req);
+          if (!user) return sendJson(res, 401, { success: false, error: 'Unauthorized' });
+          const body = await parseJsonBody(req);
+          const updated = repoController.updateRepo(repoId, user.id, body);
+          if (!updated) return sendJson(res, 404, { success: false, error: 'Formula not found or permission denied' });
+          return sendJson(res, 200, { success: true, item: updated });
+        }
+
+        if (req.method === 'DELETE') {
+          const user = getAuthUser(req);
+          if (!user) return sendJson(res, 401, { success: false, error: 'Unauthorized' });
+          const ok = repoController.deleteRepo(repoId, user.id);
+          if (!ok) return sendJson(res, 404, { success: false, error: 'Formula not found or permission denied' });
+          return sendJson(res, 200, { success: true, message: 'Deleted' });
+        }
       }
 
       // 2. 庆典项目管理
@@ -329,11 +423,13 @@ const server = http.createServer(async (req, res) => {
   serveStaticFile(req, res, filePath);
 });
 
-server.listen(PORT, () => {
-  console.log(`🏮 中华华节盛典 · 全栈服务已启动`);
-  console.log(`🌐 访问地址: http://localhost:${PORT}`);
-  console.log(`📡 数据库: SQLite 文件已挂载`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`☯ 两仪天工 · 智算文心 全栈服务已启动`);
+    console.log(`🌐 访问地址: http://localhost:${PORT}`);
+    console.log(`📡 数据库: SQLite 文件已挂载 (两仪拓扑与岁时双引擎数据表就绪)`);
+  });
+}
 
 // 优雅停机
 process.on('SIGINT', () => {
@@ -342,3 +438,5 @@ process.on('SIGINT', () => {
     process.exit(0);
   });
 });
+
+module.exports = server;

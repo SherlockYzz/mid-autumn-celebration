@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>John Tromp's Lambda Diagrams - Minimalist Workstation</title>
+
+  <!-- Modular Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/diagram.css">
+  <link rel="stylesheet" href="css/modal.css">
+</head>
+<body data-theme="dark">
+
+  <!-- Header -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-logo">λ</div>
+      <div class="brand-titles">
+        <h1>
+          <span id="txtBrandTitle">John Tromp Lambda 图动态演算工作台</span>
+          <span class="badge-tag" id="txtBadge">Tromp Diagrams</span>
+        </h1>
+        <p id="txtBrandSub">纯黑白极简电路式几何拓扑 · 五阶段 β-规约动态演示 · 作用域分析器</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <button id="langToggleBtn" class="btn" title="Switch Language / 切换语言">English</button>
+      <button id="themeToggleBtn" class="btn" title="Toggle Theme / 切换主题">浅色模式</button>
+      <button id="repoOpenBtn" class="btn" title="Formula Repository / 表达式仓库">公式仓库</button>
+      <button id="authOpenBtn" class="btn" title="User Authentication / 登录注册">登录 / 注册</button>
+      <button id="guideModalBtn" class="btn">图解指南</button>
+      <button id="aboutModalBtn" class="btn">关于 Tromp</button>
+    </div>
+  </header>
+
+  <!-- Workspace Layout -->
+  <div class="workspace-layout">
+
+    <!-- Left Controls Panel -->
+    <aside class="sidebar-panel">
+
+      <!-- Input Card -->
+      <div class="sidebar-card">
+        <div class="card-header-row">
+          <span id="lblInputSection">表达式输入</span>
+          <span id="syntaxStatus" class="status-badge status-active">就绪</span>
+        </div>
+
+        <div class="segmented-tabs">
+          <button class="segmented-tab active" data-input-mode="classic" id="tabModeClassic">经典记法 (λx.x)</button>
+          <button class="segmented-tab" data-input-mode="debruijn" id="tabModeDeBruijn">De Bruijn 记法 (λλ1)</button>
+        </div>
+
+        <textarea id="expressionInput" class="expr-textarea" spellcheck="false" placeholder="输入表达式，例如 (\x. x) y 或 (\f. \x. f (f x))"></textarea>
+
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <button id="openPresetsModalBtn" class="btn" style="flex: 1; text-align: left; display: flex; justify-content: space-between; align-items: center;" title="打开预设公式列表 / Open Preset Formulas">
+            <span id="lblOpenPresets">预设公式库...</span>
+            <span class="badge-tag" style="font-size: 9px; padding: 0 4px;" id="lblPresetCount">23 项</span>
+          </button>
+          <button id="saveToRepoBtn" class="btn" title="保存至表达式仓库 / Save to Repository">存入仓库</button>
+          <button id="loadParseBtn" class="btn btn-solid" style="padding: 5px 12px;">解析绘制</button>
+        </div>
+
+        <div class="symbol-rack">
+          <span class="symbol-key" data-sym="λ">λ</span>
+          <span class="symbol-key" data-sym="\">\\</span>
+          <span class="symbol-key" data-sym="/">/</span>
+          <span class="symbol-key" data-sym=".">.</span>
+          <span class="symbol-key" data-sym="(">(</span>
+          <span class="symbol-key" data-sym=")">)</span>
+          <span class="symbol-key" data-sym="let ">let</span>
+          <span class="symbol-key" data-sym=" in ">in</span>
+        </div>
+      </div>
+
+      <!-- 5-Phase Animation Stepper Card -->
+      <div class="sidebar-card">
+        <div class="card-header-row">
+          <span id="lblStepperSection">五阶段 β-规约演进器</span>
+          <span id="stepCounterLabel" style="font-family: var(--font-code); color: var(--text-dim);">第 0 步</span>
+        </div>
+
+        <!-- 5-Phase Timeline Bar -->
+        <div class="phase-timeline-bar" title="点击跳转至特定阶段">
+          <div class="phase-pill active" data-phase="1" id="phasePill1">1. 锁定红基</div>
+          <div class="phase-pill" data-phase="2" id="phasePill2">2. 关联形参</div>
+          <div class="phase-pill" data-phase="3" id="phasePill3">3. 溶解横梁</div>
+          <div class="phase-pill" data-phase="4" id="phasePill4">4. 代换接入</div>
+          <div class="phase-pill" data-phase="5" id="phasePill5">5. 最终整流</div>
+        </div>
+
+        <!-- 7-Button Stepper Controls Row (Pure SVG Icons) -->
+        <div class="stepper-row-7">
+          <button id="macroResetBtn" class="btn" title="重置到初始项 (R) / Reset to initial" aria-label="重置">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="3" width="2" height="10" rx="0.5"/><polygon points="14,3 5,8 14,13"/></svg>
+          </button>
+          <button id="macroPrevBtn" class="btn" title="单步后退 (←) / Step backward" aria-label="单步后退">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 3.5L4 8l4.5 4.5M13 3.5L8.5 8l4.5 4.5"/></svg>
+          </button>
+          <button id="microPrevBtn" class="btn" title="上一微阶段 / Previous micro-phase" aria-label="上一微阶段">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8 10 12.5"/></svg>
+          </button>
+          <button id="playPauseBtn" class="btn btn-solid" title="自动演示 (Space) / Play" aria-label="自动演示">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><polygon points="4.5,3 13,8 4.5,13"/></svg>
+          </button>
+          <button id="microNextBtn" class="btn" title="下一微阶段 (Shift+→) / Next micro-phase" aria-label="下一微阶段">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg>
+          </button>
+          <button id="macroNextBtn" class="btn" title="单步规约 (→) / Step forward" aria-label="单步规约">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3.5L7.5 8 3 12.5M7.5 3.5L12 8l-4.5 4.5"/></svg>
+          </button>
+          <button id="reduceNormalFormBtn" class="btn" title="规约至范式 / Reduce to normal form" aria-label="规约至范式">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><polygon points="2,3 11,8 2,13"/><rect x="12" y="3" width="2" height="10" rx="0.5"/></svg>
+          </button>
+        </div>
+
+        <!-- Narrative Explanation Box -->
+        <div id="narrativeBox" class="narrative-box">
+          <span id="narrativeText">就绪。可点击“单步规约”或“下一微阶段”查看演算步骤。</span>
+        </div>
+
+        <div class="meta-control-row">
+          <span id="lblStrategy">规约策略:</span>
+          <select id="strategyDropdown" class="ui-select" style="flex: 1;">
+            <option value="normal" id="optNormalOrder">最左最外优先 (正常序)</option>
+            <option value="applicative" id="optApplicativeOrder">应用序 (最内优先)</option>
+          </select>
+        </div>
+
+        <div class="meta-control-row">
+          <span id="lblSpeed">演示速率:</span>
+          <input type="range" id="animSpeedSlider" min="100" max="1800" value="450" step="50">
+          <span id="speedValueLabel" style="width: 45px; text-align: right; font-family: var(--font-code);">450ms</span>
+        </div>
+      </div>
+
+      <!-- Synchronized Code Inspector -->
+      <div class="sidebar-card">
+        <div class="card-header-row">
+          <span id="lblCodeSection">代码与项对照</span>
+          <button id="copyNamedTermBtn" class="btn" style="padding: 1px 6px; font-size: 10px;">复制表达式</button>
+        </div>
+        <div class="code-inspector-wrap">
+          <span class="label" id="lblNamedNotation">经典变量记法</span>
+          <div id="codeNamedContainer" style="word-break: break-all;">λf. λx. f (f x)</div>
+          <span class="label" style="margin-top: 8px;" id="lblDeBruijnNotation">De Bruijn 索引记法</span>
+          <div id="codeDeBruijnContainer" style="color: var(--text-dim); word-break: break-all;">\ \ 2 (2 1)</div>
+        </div>
+      </div>
+
+      <!-- Step History Table -->
+      <div class="sidebar-card" style="flex: 1; display: flex; flex-direction: column; min-height: 180px;">
+        <div class="card-header-row">
+          <span id="lblHistorySection">规约历史</span>
+          <span id="historyBadgeCount" class="badge-tag" style="font-size: 10px;">1 步</span>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th style="width: 28px;">#</th>
+                <th style="width: 58px;" id="thHistRule">规则</th>
+                <th id="thHistTerm">表达式</th>
+              </tr>
+            </thead>
+            <tbody id="stepHistoryTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main Viewport -->
+    <main class="canvas-viewport-wrap">
+
+      <!-- Viewport Top Toolbar -->
+      <div class="canvas-top-bar">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="view-tabs-group">
+            <button class="view-tab active" data-tab="svg" id="tabSvgView">SVG 矢量图</button>
+            <button class="view-tab" data-tab="boxchar" id="tabBoxCharView">Unicode 制表画</button>
+            <button class="view-tab" data-tab="ascii" id="tabAsciiView">ASCII 点阵网格</button>
+          </div>
+
+          <div style="height: 16px; width: 1px; background: var(--border); margin: 0 4px;"></div>
+
+          <select id="diagramStyleSelect" class="ui-select" title="Tromp Style">
+            <option value="standard" id="optStyleStd">标准风格 (最左变量连接)</option>
+            <option value="alt" id="optStyleAlt">替代风格 (最近深层连接)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button id="exportSvgAction" class="btn" style="padding: 4px 8px; font-size: 11px;">导出 SVG</button>
+          <button id="exportPngAction" class="btn" style="padding: 4px 8px; font-size: 11px;">导出 PNG</button>
+        </div>
+      </div>
+
+      <!-- SVG Canvas View -->
+      <div id="svgCanvasContainer" class="svg-canvas-container">
+        <svg id="primarySvgDiagram" class="main-diagram-svg">
+          <defs>
+            <pattern id="canvasDotPattern" width="32" height="32" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1" fill="var(--grid-dot)" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#canvasDotPattern)" />
+          <g id="diagramSceneGroup">
+            <!-- Diagram layers generated here -->
+          </g>
+        </svg>
+
+        <!-- Floating Viewport Controls -->
+        <div class="floating-viewport-ctrls">
+          <button class="floating-icon-btn" id="ctrlZoomIn" title="放大 / Zoom In">+</button>
+          <button class="floating-icon-btn" id="ctrlZoomOut" title="缩小 / Zoom Out">−</button>
+          <button class="floating-icon-btn" id="ctrlFitDiagram" title="视口居中自适应 / Fit View">FIT</button>
+          <button class="floating-icon-btn" id="ctrlResetZoom" title="重置比例 (1:1)">1:1</button>
+        </div>
+      </div>
+
+      <!-- Monospace Box-Art & ASCII Text View -->
+      <div id="monoViewContainer" class="mono-view-container">
+        <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <span id="monoTitleLabel" style="font-weight: 600; font-size: 12px; color: var(--text-muted);">John Tromp Unicode 制表字符画 (boxChar)</span>
+          <button id="copyMonoTextBtn" class="btn btn-solid" style="font-size: 11px;">复制字符画</button>
+        </div>
+        <pre id="monoDiagramDisplay" class="mono-card"></pre>
+      </div>
+
+      <!-- Interactive Hover Tooltip -->
+      <div id="nodeInspectorTooltip" class="interactive-tooltip">
+        <div class="t-head" id="tooltipHeader">元素</div>
+        <div class="t-body" id="tooltipContent">详情</div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Presets Selection List Table Modal -->
+  <div id="presetsModal" class="modal-backdrop">
+    <div class="modal-box modal-box-lg">
+      <div class="modal-top">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h2 id="modalPresetsTitle">预设公式库</h2>
+          <span class="badge-tag" id="modalPresetsBadge">23 个经典公式</span>
+        </div>
+        <button class="close-modal-btn" data-modal="presetsModal">×</button>
+      </div>
+
+      <!-- Search & Category Filters -->
+      <div class="preset-filter-toolbar">
+        <input type="text" id="presetSearchInput" class="preset-search-input" placeholder="快速筛选名称、组合子或表达式...">
+        <div class="preset-category-tabs" id="presetCategoryTabs">
+          <button class="preset-cat-tab active" data-category="all" id="catTabAll">全部</button>
+          <button class="preset-cat-tab" data-category="church" id="catTabChurch">Church 计数</button>
+          <button class="preset-cat-tab" data-category="core" id="catTabCore">基础组合子</button>
+          <button class="preset-cat-tab" data-category="arithmetic" id="catTabArith">算术与逻辑</button>
+          <button class="preset-cat-tab" data-category="classics" id="catTabClassics">Tromp 经典项</button>
+        </div>
+      </div>
+
+      <!-- Presets Table Container (Custom scrollbar applied) -->
+      <div class="presets-table-container">
+        <table class="presets-table">
+          <thead>
+            <tr>
+              <th style="width: 15%;" id="thSymbol">名称 / 标识</th>
+              <th style="width: 37%;" id="thExpression">Lambda 表达式</th>
+              <th style="width: 16%;" id="thCategory">类别</th>
+              <th style="width: 22%;" id="thDescription">说明</th>
+              <th style="width: 10%; text-align: right;" id="thAction">操作</th>
+            </tr>
+          </thead>
+          <tbody id="presetsTableBody">
+            <!-- Populated dynamically via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer-note">
+        <span id="txtModalFooterTip">提示：点击列表任意行或点击右侧 [载入]，即可将该公式载入工作台并立即绘制 Tromp 图。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Authentication Modal -->
+  <div id="authModal" class="modal-backdrop">
+    <div class="modal-box auth-box">
+      <div class="modal-top">
+        <h2 id="modalAuthTitle">用户身份认证</h2>
+        <button class="close-modal-btn">×</button>
+      </div>
+
+      <div class="auth-tabs" id="authModalTabs">
+        <button class="auth-tab active" id="authTabLogin">账号登录</button>
+        <button class="auth-tab" id="authTabRegister">新用户注册</button>
+      </div>
+
+      <div id="authStatusMessage" class="auth-message"></div>
+
+      <!-- Login Form -->
+      <form id="authLoginForm" class="auth-form">
+        <div class="form-group">
+          <label class="form-label" id="lblLoginUser">用户名</label>
+          <input type="text" id="loginUsername" class="form-input" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="lblLoginPass">密码</label>
+          <input type="password" id="loginPassword" class="form-input" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn-solid" style="width: 100%; padding: 8px;" id="btnSubmitLogin">立即登录</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="authRegisterForm" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" id="lblRegUser">用户名 (3-32位字符)</label>
+          <input type="text" id="regUsername" class="form-input" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="lblRegPass">密码 (不少于6位)</label>
+          <input type="password" id="regPassword" class="form-input" autocomplete="new-password" required>
+        </div>
+        <button type="submit" class="btn btn-solid" style="width: 100%; padding: 8px;" id="btnSubmitRegister">确认注册</button>
+      </form>
+
+      <!-- Profile View -->
+      <div id="authProfileView" style="display: none;">
+        <div class="profile-card">
+          <div class="profile-row">
+            <span id="lblProfileUser">当前用户:</span>
+            <span class="profile-value" id="profileUsername">--</span>
+          </div>
+          <div class="profile-row">
+            <span id="lblProfileDate">注册时间:</span>
+            <span class="profile-value" id="profileCreated">--</span>
+          </div>
+          <div class="profile-row">
+            <span id="lblProfileRepos">云端公式:</span>
+            <span class="profile-value" id="profileRepoCount">0 项</span>
+          </div>
+        </div>
+        <button id="authLogoutBtn" class="btn btn-danger" style="width: 100%; padding: 8px;" id="btnLogout">退出登录</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expression Repository Modal -->
+  <div id="repoModal" class="modal-backdrop">
+    <div class="modal-box repo-modal-box">
+      <div class="modal-top">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h2 id="modalRepoTitle">表达式仓库</h2>
+          <span class="badge-tag" id="modalRepoBadge">Formula Store</span>
+        </div>
+        <button class="close-modal-btn">×</button>
+      </div>
+
+      <div class="repo-toolbar">
+        <div class="preset-category-tabs">
+          <button class="preset-cat-tab active" id="repoTabMy">我的云端仓库</button>
+          <button class="preset-cat-tab" id="repoTabPublic">公共广场</button>
+          <button class="preset-cat-tab" id="repoTabOffline">本地离线存储</button>
+        </div>
+
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button id="repoExportBtn" class="btn" style="font-size: 11px;">导出 (JSON)</button>
+          <button id="repoImportBtn" class="btn" style="font-size: 11px;">导入 (JSON)</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <input type="text" id="repoSearchInput" class="preset-search-input" placeholder="检索公式标题、代码或标签...">
+      </div>
+
+      <div id="repoCardGrid" class="repo-card-grid">
+        <!-- Cards dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Current Formula Dialog -->
+  <div id="saveRepoModal" class="modal-backdrop">
+    <div class="modal-box" style="width: 480px;">
+      <div class="modal-top">
+        <h2 id="modalSaveTitle">保存表达式入库</h2>
+        <button class="close-modal-btn">×</button>
+      </div>
+      <form id="saveRepoForm">
+        <div class="form-group">
+          <label class="form-label" id="lblSaveTitle">公式标题</label>
+          <input type="text" id="saveRepoTitle" class="form-input" placeholder="例如: Church 2" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="lblSaveCode">表达式代码</label>
+          <input type="text" id="saveRepoCode" class="form-input" style="font-family: var(--font-code);" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="lblSaveDesc">说明描述 (可选)</label>
+          <textarea id="saveRepoDesc" class="form-input" style="height: 60px; resize: vertical;"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="lblSaveTags">标签 (逗号分隔)</label>
+          <input type="text" id="saveRepoTags" class="form-input" placeholder="church, math, combinator">
+        </div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="saveRepoPublic" style="accent-color: var(--text);">
+          <label for="saveRepoPublic" style="font-size: 12px; color: var(--text-muted); cursor: pointer;" id="lblSavePublic">在公共广场公开分享</label>
+        </div>
+        <button type="submit" class="btn btn-solid" style="width: 100%; padding: 8px; margin-top: 6px;" id="btnConfirmSave">保存入库</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Visual Guide Modal -->
+  <div id="visualGuideModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-top">
+        <h2 id="modalGuideTitle">John Tromp Lambda 图解指南</h2>
+        <button class="close-modal-btn" data-modal="visualGuideModal">×</button>
+      </div>
+      <div class="modal-inner" id="modalGuideBody">
+        <!-- Content populated via i18n -->
+      </div>
+    </div>
+  </div>
+
+  <!-- About John Tromp Modal -->
+  <div id="aboutTrompModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-top">
+        <h2 id="modalAboutTitle">关于 John Tromp 与二进制 Lambda 演算</h2>
+        <button class="close-modal-btn" data-modal="aboutTrompModal">×</button>
+      </div>
+      <div class="modal-inner" id="modalAboutBody">
+        <!-- Content populated via i18n -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modular Scripts -->
+  <script src="js/i18n.js"></script>
+  <script src="js/presets.js"></script>
+  <script src="js/ast.js"></script>
+  <script src="js/reduction.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/repo.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

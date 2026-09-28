@@ -1,6 +1,7 @@
-# 🏮 中华华节盛典 · 岁时交互引擎系统
-> **Chinese Traditional & National Festival Celebration Interactive Suite**  
-> **双引擎架构：现代游戏级 Web GUI 端 ＋ 现代 C++17 纯原生终端字符端**
+# ☯ 两仪天工 · 智算文心：形式化拓扑演算与中华岁时交互全栈数字系统
+> **Computational Tao: Topological Lambda Calculus & Chinese Traditional Festival Interaction System**  
+> **全国人工智能创新应用挑战赛（软件赛道 · 教育科研 / 文化娱乐）参赛作品**  
+> **多模态 AI Agent 决策中枢 ＋ John Tromp 拓扑演算引擎 ＋ 华夏岁时盛典 ＋ 星汉算筹天象排盘**
 
 ---
 
