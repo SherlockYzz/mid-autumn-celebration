@@ -116,17 +116,23 @@
       letter-spacing: 1px;
     }
 
-    /* 节日选择 Dock */
+    /* 节日次级选择 Dock (悬浮于主导航下方居中) */
     .festival-dock {
+      position: absolute;
+      top: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
       display: flex;
-      background: var(--glass-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(14, 22, 40, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
       border-radius: 40px;
-      padding: 4px;
-      box-shadow: var(--glass-shadow);
+      padding: 3px 6px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
       gap: 4px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .fest-tab-btn {
@@ -261,16 +267,16 @@
     /* 屏幕正中悬浮项目横幅标语 */
     .active-project-banner {
       position: absolute;
-      top: 76px;
+      top: 114px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 5;
       background: linear-gradient(90deg, transparent, rgba(14, 22, 40, 0.85) 20%, rgba(14, 22, 40, 0.85) 80%, transparent);
       border-top: 1px solid rgba(245, 215, 127, 0.3);
       border-bottom: 1px solid rgba(245, 215, 127, 0.3);
-      padding: 6px 36px;
-      font-size: 14px;
-      letter-spacing: 3px;
+      padding: 5px 32px;
+      font-size: 13px;
+      letter-spacing: 2px;
       color: var(--gold-bright);
       text-shadow: 0 0 10px rgba(245, 215, 127, 0.7);
       pointer-events: none;
@@ -286,7 +292,7 @@
     /* 左右两对联立柱 (新春/中秋自选联) */
     .pillar-couplet {
       position: absolute;
-      top: 130px;
+      top: 156px;
       z-index: 5;
       writing-mode: vertical-rl;
       background: linear-gradient(180deg, #991b1b, #7f1d1d);
@@ -1122,22 +1128,6 @@
       </button>
     </nav>
 
-    <!-- 节日选择 Dock (桌面与平板端) -->
-    <nav class="festival-dock" aria-label="节日切换">
-      <button class="fest-tab-btn active" data-fest="mid_autumn" title="快捷键 [1]">
-        <span>🌕</span> 中秋追月 <span class="tab-hotkey-badge">1</span>
-      </button>
-      <button class="fest-tab-btn" data-fest="national_day" title="快捷键 [2]">
-        <span>🇨🇳</span> 盛世国庆 <span class="tab-hotkey-badge">2</span>
-      </button>
-      <button class="fest-tab-btn" data-fest="spring_festival" title="快捷键 [3]">
-        <span>🏮</span> 新春除夕 <span class="tab-hotkey-badge">3</span>
-      </button>
-      <button class="fest-tab-btn" data-fest="lantern_festival" title="快捷键 [4]">
-        <span>🎏</span> 上元灯会 <span class="tab-hotkey-badge">4</span>
-      </button>
-    </nav>
-
     <!-- 顶部右侧控制群 -->
     <div class="top-controls">
       <div class="hud-chip" id="heat-chip" title="当前累计节庆热度（每增2000点引爆大盛典）">
@@ -1164,6 +1154,22 @@
       </button>
     </div>
   </header>
+
+  <!-- 节日次级悬浮选择 Dock (仅在华彩岁时视口居中呈现) -->
+  <nav class="festival-dock" id="festival-dock" aria-label="节日切换">
+    <button class="fest-tab-btn active" data-fest="mid_autumn" title="快捷键 [1]">
+      <span>🌕</span> 中秋追月 <span class="tab-hotkey-badge">1</span>
+    </button>
+    <button class="fest-tab-btn" data-fest="national_day" title="快捷键 [2]">
+      <span>🇨🇳</span> 盛世国庆 <span class="tab-hotkey-badge">2</span>
+    </button>
+    <button class="fest-tab-btn" data-fest="spring_festival" title="快捷键 [3]">
+      <span>🏮</span> 新春除夕 <span class="tab-hotkey-badge">3</span>
+    </button>
+    <button class="fest-tab-btn" data-fest="lantern_festival" title="快捷键 [4]">
+      <span>🎏</span> 上元灯会 <span class="tab-hotkey-badge">4</span>
+    </button>
+  </nav>
 
   <!-- 当前激活的庆典项目动态横幅 -->
   <div class="active-project-banner" id="project-banner">
